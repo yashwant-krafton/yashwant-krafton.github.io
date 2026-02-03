@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India Top Games Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #05050f 0%, #0a0a1a 25%, #0d0915 50%, #080510 75%, #030308 100%);
+            color: #c8ccd8;
+            padding: 32px;
+            font-size: 16px;
+            line-height: 1.6;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 80px 40px, rgba(255,180,180,0.9), transparent),
+                radial-gradient(1px 1px at 160px 90px, rgba(180,180,255,0.8), transparent),
+                radial-gradient(2px 2px at 280px 60px, rgba(255,255,180,0.9), transparent),
+                radial-gradient(1px 1px at 350px 180px, rgba(180,255,255,0.7), transparent),
+                radial-gradient(2px 2px at 480px 30px, rgba(255,180,255,0.8), transparent),
+                radial-gradient(1px 1px at 550px 140px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(2px 2px at 680px 200px, rgba(180,220,255,0.8), transparent),
+                radial-gradient(1px 1px at 780px 70px, rgba(255,220,180,0.7), transparent),
+                radial-gradient(2px 2px at 900px 160px, rgba(200,180,255,0.9), transparent),
+                radial-gradient(1px 1px at 1000px 50px, rgba(180,255,200,0.7), transparent),
+                radial-gradient(2px 2px at 1120px 120px, rgba(255,200,200,0.8), transparent),
+                radial-gradient(1px 1px at 1220px 190px, rgba(200,200,255,0.8), transparent),
+                radial-gradient(1px 1px at 120px 280px, rgba(255,255,200,0.7), transparent),
+                radial-gradient(2px 2px at 250px 350px, rgba(200,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 400px 300px, rgba(255,200,255,0.7), transparent),
+                radial-gradient(2px 2px at 530px 380px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(1px 1px at 700px 320px, rgba(200,220,255,0.8), transparent),
+                radial-gradient(2px 2px at 850px 400px, rgba(255,220,200,0.7), transparent),
+                radial-gradient(1px 1px at 980px 280px, rgba(220,200,255,0.8), transparent),
+                radial-gradient(2px 2px at 1100px 360px, rgba(200,255,220,0.7), transparent),
+                radial-gradient(1px 1px at 60px 450px, rgba(255,200,220,0.8), transparent),
+                radial-gradient(2px 2px at 200px 500px, rgba(220,220,255,0.7), transparent),
+                radial-gradient(1px 1px at 380px 480px, rgba(255,255,220,0.8), transparent),
+                radial-gradient(2px 2px at 600px 520px, rgba(220,255,255,0.7), transparent);
+            background-size: 1300px 580px;
+            pointer-events: none;
+            z-index: 0;
+            animation: twinkle 4s ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.6; }
+            50% { opacity: 0.9; }
+            100% { opacity: 0.7; }
+        }
+        body > * { position: relative; z-index: 1; }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(10,10,30,0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(100,100,150,0.4); border-radius: 4px; }
+        
+        .header { text-align: center; margin-bottom: 36px; }
+        .header-title { display: inline-flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+        .header h1 {
+            font-size: 36px; font-weight: 600; letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #a0a8d0, #8890c0);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .header p { color: #6a6a8a; font-size: 15px; font-weight: 400; }
+        .emoji { font-size: 36px; }
+        
+        .controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .toggle-label {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(20,20,40,0.7); padding: 10px 14px; border-radius: 10px;
+            cursor: pointer; border: 1px solid rgba(100,100,150,0.2);
+            transition: all 0.2s; font-size: 13px;
+        }
+        .toggle-label:hover { background: rgba(30,30,55,0.8); border-color: rgba(120,120,170,0.3); }
+        .toggle-label input { width: 16px; height: 16px; cursor: pointer; accent-color: #7080b0; }
+        .toggle-label span { font-weight: 500; }
+        
+        .search-input {
+            flex: 1; min-width: 180px; max-width: 280px; padding: 10px 14px;
+            border-radius: 10px; border: 1px solid rgba(100,100,150,0.2);
+            background: rgba(20,20,40,0.7); color: #c8ccd8; font-size: 13px; font-family: inherit;
+        }
+        .search-input:focus { outline: none; border-color: rgba(130,130,180,0.5); background: rgba(25,25,50,0.8); }
+        .search-input::placeholder { color: #4a4a6a; }
+        
+        .country-filter {
+            padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(100,100,150,0.2);
+            background: rgba(20,20,40,0.7); color: #c8ccd8; font-size: 13px; font-family: inherit;
+            cursor: pointer; min-width: 160px;
+        }
+        .country-filter:focus { outline: none; border-color: rgba(130,130,180,0.5); }
+        .country-filter option { background: #15152a; color: #c8ccd8; }
+        
+        .legend {
+            background: rgba(15,15,35,0.7); border-radius: 14px; padding: 16px 24px;
+            margin-bottom: 24px; border: 1px solid rgba(100,100,150,0.15);
+            display: flex; gap: 28px; flex-wrap: wrap; align-items: center;
+        }
+        .legend-title { font-weight: 600; font-size: 13px; color: #9098c0; letter-spacing: 0.5px; text-transform: uppercase; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #8a8aa8; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .dot-green { background: #059669; box-shadow: 0 0 6px rgba(5,150,105,0.5); }
+        .dot-yellow { background: #D97706; box-shadow: 0 0 6px rgba(217,119,6,0.5); }
+        .dot-red { background: #DC2626; box-shadow: 0 0 6px rgba(220,38,38,0.5); }
+        
+        .card {
+            background: rgba(15,15,35,0.6); border-radius: 16px;
+            margin-bottom: 28px; border: 1px solid rgba(100,100,150,0.12);
+            overflow: hidden;
+        }
+        
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        thead tr { background: rgba(25,25,55,0.7); }
+        th {
+            padding: 14px 10px; font-size: 12px; font-weight: 600; color: #9098c0;
+            text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap; 
+            cursor: pointer; user-select: none; transition: background 0.2s;
+        }
+        th.no-sort { cursor: default; }
+        th:hover:not(.no-sort) { background: rgba(40,40,80,0.6); }
+        .sort-icon { margin-left: 4px; opacity: 0.5; font-size: 11px; }
+        
+        tbody tr { border-bottom: 1px solid rgba(100,100,150,0.08); transition: background 0.15s; }
+        tbody tr:nth-child(even) { background: rgba(20,20,45,0.4); }
+        tbody tr:hover { background: rgba(40,40,80,0.3); }
+        
+        td { padding: 10px 10px; font-size: 13px; vertical-align: middle; }
+        .td-rank { text-align: center; font-weight: 600; color: #a0a8d0; font-size: 14px; }
+        .td-center { text-align: center; vertical-align: middle; }
+        .td-game { font-weight: 500; max-width: 200px; font-size: 13px; }
+        .td-publisher { color: #8a8aa8; font-size: 12px; max-width: 140px; }
+        .td-country { color: #7a8a9a; font-size: 12px; }
+        .td-number { text-align: center; font-size: 13px; font-weight: 500; color: #fff; }
+        
+        .growth-positive { color: #22c55e !important; }
+        .growth-negative { color: #ef4444 !important; }
+        
+        .status-select {
+            padding: 5px 8px; border-radius: 6px; border: none; color: #fff;
+            font-size: 13px; cursor: pointer;
+            font-family: inherit; transition: transform 0.1s;
+            text-align: center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        .status-select:hover { transform: scale(1.05); }
+        .status-green { background: #059669; }
+        .status-yellow { background: #D97706; }
+        .status-red { background: #DC2626; }
+        
+        .comment-box {
+            width: 100%; min-height: 32px; max-height: 100px; padding: 6px 8px;
+            border-radius: 6px; border: 1px solid rgba(100,100,150,0.2);
+            background: rgba(20,20,45,0.6); color: #c8ccd8; font-size: 12px;
+            font-family: inherit; resize: vertical; line-height: 1.4;
+            overflow-y: auto;
+        }
+        .comment-box:focus { outline: none; border-color: rgba(130,130,180,0.4); background: rgba(25,25,55,0.7); }
+        .comment-box::placeholder { color: #4a4a6a; }
+        
+        .footer { text-align: center; margin-top: 28px; color: #5a5a7a; font-size: 13px; }
+        
+        .drive-section {
+            text-align: center; margin-top: 36px; padding: 28px;
+            background: rgba(15,15,35,0.6); border-radius: 16px;
+            border: 1px solid rgba(100,100,150,0.12);
+        }
+        .drive-btn {
+            display: inline-flex; align-items: center; gap: 12px;
+            padding: 16px 32px; border-radius: 10px; border: none;
+            background: linear-gradient(135deg, #4a5080, #3a4070);
+            color: #fff; font-size: 16px; font-weight: 600; font-family: inherit;
+            cursor: pointer; text-decoration: none; transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(60,60,120,0.3);
+        }
+        .drive-btn:hover { 
+            background: linear-gradient(135deg, #5a60a0, #4a5090); 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 25px rgba(80,80,150,0.4); 
+        }
+        .drive-btn svg { width: 22px; height: 22px; }
+        .drive-note { margin-top: 14px; font-size: 13px; color: #5a5a7a; }
+        
+        .col-country { display: none; }
+        .col-dl-change { display: none; }
+        .col-dau-change { display: none; }
+        .col-mau-change { display: none; }
+        .show-country .col-country { display: table-cell; }
+        .show-dl-change .col-dl-change { display: table-cell; }
+        .show-dau-change .col-dau-change { display: table-cell; }
+        .show-mau-change .col-mau-change { display: table-cell; }
+        
+        .toggle-btn {
+            background: rgba(60,60,100,0.5); border: 1px solid rgba(100,100,150,0.3);
+            color: #9098c0; padding: 2px 6px; border-radius: 4px; font-size: 10px;
+            cursor: pointer; margin-left: 4px; transition: all 0.2s;
+        }
+        .toggle-btn:hover { background: rgba(80,80,120,0.6); }
+        .toggle-btn.active { background: rgba(100,100,150,0.5); color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            <span class="emoji">🎮</span>
+            <h1>India Top Games Dashboard</h1>
+            <span class="emoji">🇮🇳</span>
+        </div>
+        <p>Data: Jan 2025 - Jan 2026 · Source: Sensor Tower</p>
+    </div>
+
+    <div class="controls">
+        <label class="toggle-label">
+            <input type="checkbox" id="toggle200">
+            <span>Show Top 200</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" id="toggleCountry">
+            <span>Show Country</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" id="toggleDLChange">
+            <span>Δ Downloads</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" id="toggleDAUChange">
+            <span>Δ DAU</span>
+        </label>
+        <label class="toggle-label">
+            <input type="checkbox" id="toggleMAUChange">
+            <span>Δ MAU</span>
+        </label>
+        <select class="country-filter" id="countryFilter">
+            <option value="">All Countries</option>
+        </select>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search games or publishers...">
+    </div>
+
+    <div class="legend">
+        <span class="legend-title">Status</span>
+        <div class="legend-item"><div class="legend-dot dot-green"></div><span>Actively Engaging</span></div>
+        <div class="legend-item"><div class="legend-dot dot-yellow"></div><span>Tracking Actively</span></div>
+        <div class="legend-item"><div class="legend-dot dot-red"></div><span>Inactive Opportunity</span></div>
+    </div>
+
+    <div class="card">
+        <div class="table-container">
+            <table id="gamesTable">
+                <thead>
+                    <tr>
+                        <th data-sort="Rank" style="width:50px"># <span class="sort-icon">↕</span></th>
+                        <th class="no-sort" style="width:60px; text-align:center">Status</th>
+                        <th class="no-sort" style="width:180px; text-align:left">Game</th>
+                        <th class="no-sort" style="width:130px; text-align:left">Publisher</th>
+                        <th class="no-sort col-country" style="width:100px; text-align:left">Country</th>
+                        <th data-sort="Downloads" style="width:90px">Downloads <span class="sort-icon">↕</span></th>
+                        <th class="no-sort col-dl-change" style="width:100px">Δ DL <button class="toggle-btn" id="dlToggle" title="Toggle Abs/%" onclick="toggleDLMode(event)">%</button></th>
+                        <th data-sort="DAU" style="width:80px">DAU <span class="sort-icon">↓</span></th>
+                        <th class="no-sort col-dau-change" style="width:100px">Δ DAU <button class="toggle-btn" id="dauToggle" title="Toggle Abs/%" onclick="toggleDAUMode(event)">%</button></th>
+                        <th data-sort="MAU" style="width:80px">MAU <span class="sort-icon">↕</span></th>
+                        <th class="no-sort col-mau-change" style="width:90px">Δ MAU</th>
+                        <th class="no-sort" style="width:160px; text-align:left">Comments</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer" id="footer">Showing Top 100 Games · Last Updated: January 2026</div>
+
+    <div class="drive-section">
+        <a href="https://drive.google.com/drive/u/0/folders/1XRwiF8T8DbnJkxQYsizDYYtvytvHo2VA" target="_blank" class="drive-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.71 3.5L1.15 15l3.43 6h13.71l3.43-6L15.15 3.5H7.71zm.79 1.5h5.93l5.14 9h-5.93l-5.14-9zM8.57 15h10.29l-2.57 4.5H5.99L8.57 15z"/>
+            </svg>
+            Open Data in Google Drive
+        </a>
+        <p class="drive-note">View and edit the complete dataset with your team</p>
+    </div>
+
+<script>
+var gamesData = [{"Rank": 1, "GameName": "Garena Free Fire", "Publisher": "Sea", "Country": "Singapore", "Downloads": 87106139, "DownloadsGrowth": -1594327, "DownloadsGrowthPct": -1.8, "DAU": 28589784, "DAUGrowth": 1397181, "DAUGrowthPct": 5.14, "MAU": 71566612, "MAUGrowth": 8504926, "Status": "red"}, {"Rank": 2, "GameName": "Candy Crush Saga", "Publisher": "Microsoft", "Country": "United Kingdom", "Downloads": 32280379, "DownloadsGrowth": -2323148, "DownloadsGrowthPct": -6.71, "DAU": 12525895, "DAUGrowth": -2435539, "DAUGrowthPct": -16.28, "MAU": 58026327, "MAUGrowth": 3635997, "Status": "red"}, {"Rank": 3, "GameName": "Ludo King", "Publisher": "Gametion", "Country": "India", "Downloads": 110819682, "DownloadsGrowth": -5706960, "DownloadsGrowthPct": -4.9, "DAU": 7481953, "DAUGrowth": -1140659, "DAUGrowthPct": -13.23, "MAU": 56423437, "MAUGrowth": -3909225, "Status": "yellow"}, {"Rank": 4, "GameName": "BATTLEGROUNDS MOBILE INDIA", "Publisher": "Krafton", "Country": "South Korea", "Downloads": 38013776, "DownloadsGrowth": 3167951, "DownloadsGrowthPct": 9.09, "DAU": 6577680, "DAUGrowth": -1572554, "DAUGrowthPct": -19.29, "MAU": 20170711, "MAUGrowth": -2819065, "Status": "red"}, {"Rank": 5, "GameName": "Roblox", "Publisher": "Roblox", "Country": "US", "Downloads": 22908525, "DownloadsGrowth": 8441326, "DownloadsGrowthPct": 58.35, "DAU": 4493472, "DAUGrowth": 2085889, "DAUGrowthPct": 86.64, "MAU": 14366603, "MAUGrowth": 5632788, "Status": "red"}, {"Rank": 6, "GameName": "Subway Surfers", "Publisher": "Miniclip", "Country": "Denmark", "Downloads": 41047584, "DownloadsGrowth": 722355, "DownloadsGrowthPct": 1.79, "DAU": 4041531, "DAUGrowth": -375992, "DAUGrowthPct": -8.51, "MAU": 24303369, "MAUGrowth": -535726, "Status": "red"}, {"Rank": 7, "GameName": "Carrom Pool: Disc Game", "Publisher": "Miniclip", "Country": "Switzerland", "Downloads": 48648717, "DownloadsGrowth": 2814341, "DownloadsGrowthPct": 6.14, "DAU": 3654562, "DAUGrowth": -568480, "DAUGrowthPct": -13.46, "MAU": 20339544, "MAUGrowth": -685856, "Status": "red"}, {"Rank": 8, "GameName": "Indian Bikes Driving 3D", "Publisher": "Rohit Gaming Studio", "Country": "India", "Downloads": 51579353, "DownloadsGrowth": -6691247, "DownloadsGrowthPct": -11.48, "DAU": 3432099, "DAUGrowth": -619237, "DAUGrowthPct": -15.28, "MAU": 21860277, "MAUGrowth": -1779892, "Status": "yellow"}, {"Rank": 9, "GameName": "Cricket League", "Publisher": "Miniclip", "Country": "Switzerland", "Downloads": 55406478, "DownloadsGrowth": 7165973, "DownloadsGrowthPct": 14.85, "DAU": 3355864, "DAUGrowth": 433443, "DAUGrowthPct": 14.83, "MAU": 16696642, "MAUGrowth": 2768598, "Status": "red"}, {"Rank": 10, "GameName": "Subway Princess Runner", "Publisher": "Ivy Mobile", "Country": "Hong Kong", "Downloads": 45664475, "DownloadsGrowth": -4162811, "DownloadsGrowthPct": -8.35, "DAU": 2552620, "DAUGrowth": -413612, "DAUGrowthPct": -13.94, "MAU": 15076465, "MAUGrowth": -1089420, "Status": "red"}, {"Rank": 11, "GameName": "Mobile Legends: Bang Bang", "Publisher": "Moonton", "Country": "China", "Downloads": 21031801, "DownloadsGrowth": 14364082, "DownloadsGrowthPct": 215.43, "DAU": 2349404, "DAUGrowth": 759362, "DAUGrowthPct": 47.76, "MAU": 6760709, "MAUGrowth": 2993243, "Status": "red"}, {"Rank": 12, "GameName": "Hill Climb Racing", "Publisher": "Fingersoft", "Country": "Finland", "Downloads": 34025347, "DownloadsGrowth": -3443458, "DownloadsGrowthPct": -9.19, "DAU": 1827901, "DAUGrowth": -170338, "DAUGrowthPct": -8.52, "MAU": 12215296, "MAUGrowth": -276251, "Status": "yellow"}, {"Rank": 13, "GameName": "Indian Vehicles Simulator 3d", "Publisher": "AN Gaming Studio", "Country": "India", "Downloads": 28660974, "DownloadsGrowth": -236546, "DownloadsGrowthPct": -0.82, "DAU": 1730339, "DAUGrowth": 209919, "DAUGrowthPct": 13.81, "MAU": 9488164, "MAUGrowth": 1607230, "Status": "yellow"}, {"Rank": 14, "GameName": "Clash of Clans", "Publisher": "Supercell", "Country": "Finland", "Downloads": 4480757, "DownloadsGrowth": -558336, "DownloadsGrowthPct": -11.08, "DAU": 1699556, "DAUGrowth": -404463, "DAUGrowthPct": -19.22, "MAU": 3936703, "MAUGrowth": -768016, "Status": "red"}, {"Rank": 15, "GameName": "Royal Match", "Publisher": "Dream Games", "Country": "Turkey", "Downloads": 12138120, "DownloadsGrowth": -3295730, "DownloadsGrowthPct": -21.35, "DAU": 1692606, "DAUGrowth": -556382, "DAUGrowthPct": -24.74, "MAU": 4255747, "MAUGrowth": -1341297, "Status": "red"}, {"Rank": 16, "GameName": "Dr. Driving", "Publisher": "SUD", "Country": "South Korea", "Downloads": 24605644, "DownloadsGrowth": 2291383, "DownloadsGrowthPct": 10.27, "DAU": 1590766, "DAUGrowth": 55650, "DAUGrowthPct": 3.63, "MAU": 11011301, "MAUGrowth": 859788, "Status": "yellow"}, {"Rank": 17, "GameName": "My11Circle - Fantasy Cricket", "Publisher": "Games24x7", "Country": "India", "Downloads": 22723622, "DownloadsGrowth": -5663574, "DownloadsGrowthPct": -19.95, "DAU": 1580116, "DAUGrowth": -323676, "DAUGrowthPct": -17.0, "MAU": 9374346, "MAUGrowth": -1276071, "Status": "red"}, {"Rank": 18, "GameName": "Worms Zone .io - Hungry Snake", "Publisher": "Azur Interactive Games", "Country": "Cyprus", "Downloads": 23010461, "DownloadsGrowth": 337679, "DownloadsGrowthPct": 1.49, "DAU": 1398695, "DAUGrowth": -54447, "DAUGrowthPct": -3.75, "MAU": 7691597, "MAUGrowth": 37347, "Status": "yellow"}, {"Rank": 19, "GameName": "My Talking Tom 2: Pet Game", "Publisher": "Outfit7 (Jinke Culture)", "Country": "Cyprus", "Downloads": 26052217, "DownloadsGrowth": -4925858, "DownloadsGrowthPct": -15.9, "DAU": 1352800, "DAUGrowth": -104368, "DAUGrowthPct": -7.16, "MAU": 9212046, "MAUGrowth": 25424, "Status": "red"}, {"Rank": 20, "GameName": "Temple Run 2: Endless Escape", "Publisher": "Imangi Studios", "Country": "US", "Downloads": 34584236, "DownloadsGrowth": 2378559, "DownloadsGrowthPct": 7.39, "DAU": 1323006, "DAUGrowth": 10955, "DAUGrowthPct": 0.83, "MAU": 10863817, "MAUGrowth": 716774, "Status": "yellow"}, {"Rank": 21, "GameName": "EA SPORTS FC Mobile Soccer", "Publisher": "Electronic Arts", "Country": "US", "Downloads": 7332376, "DownloadsGrowth": 1580377, "DownloadsGrowthPct": 27.48, "DAU": 1296579, "DAUGrowth": 82459, "DAUGrowthPct": 6.79, "MAU": 4033652, "MAUGrowth": 496085, "Status": "red"}, {"Rank": 22, "GameName": "Chess - Play & Learn Online", "Publisher": "Chess.com", "Country": "US", "Downloads": 5282388, "DownloadsGrowth": 58251, "DownloadsGrowthPct": 1.11, "DAU": 1211284, "DAUGrowth": 133905, "DAUGrowthPct": 12.43, "MAU": 4036240, "MAUGrowth": 454059, "Status": "red"}, {"Rank": 23, "GameName": "Hunter Assassin", "Publisher": "Rovio Entertainment", "Country": "Turkey", "Downloads": 39411534, "DownloadsGrowth": -6805330, "DownloadsGrowthPct": -14.72, "DAU": 1149791, "DAUGrowth": -380795, "DAUGrowthPct": -24.88, "MAU": 8830019, "MAUGrowth": -757013, "Status": "red"}, {"Rank": 24, "GameName": "Real Cricket 24", "Publisher": "Krafton", "Country": "South Korea", "Downloads": 19117544, "DownloadsGrowth": 6149186, "DownloadsGrowthPct": 47.42, "DAU": 1138768, "DAUGrowth": 58876, "DAUGrowthPct": 5.45, "MAU": 5845463, "MAUGrowth": 1222332, "Status": "red"}, {"Rank": 25, "GameName": "2 Player games : the Challenge", "Publisher": "JindoBlu", "Country": "Italy", "Downloads": 14142575, "DownloadsGrowth": -2585753, "DownloadsGrowthPct": -15.46, "DAU": 1118296, "DAUGrowth": -33398, "DAUGrowthPct": -2.9, "MAU": 7850363, "MAUGrowth": -82066, "Status": "red"}, {"Rank": 26, "GameName": "Block Blast!", "Publisher": "Hungry Studio", "Country": "Hong Kong", "Downloads": 20313221, "DownloadsGrowth": 181009, "DownloadsGrowthPct": 0.9, "DAU": 1108965, "DAUGrowth": -208859, "DAUGrowthPct": -15.85, "MAU": 5597012, "MAUGrowth": -3245, "Status": "red"}, {"Rank": 27, "GameName": "Callbreak Master - Card Game", "Publisher": "Hippo Games", "Country": "China", "Downloads": 14028962, "DownloadsGrowth": -3834027, "DownloadsGrowthPct": -21.46, "DAU": 992380, "DAUGrowth": -156070, "DAUGrowthPct": -13.59, "MAU": 3934527, "MAUGrowth": -68321, "Status": "yellow"}, {"Rank": 28, "GameName": "Offline Games - No Wifi Games", "Publisher": "JindoBlu", "Country": "Italy", "Downloads": 12408500, "DownloadsGrowth": -5111867, "DownloadsGrowthPct": -29.18, "DAU": 990392, "DAUGrowth": 311278, "DAUGrowthPct": 45.84, "MAU": 5136382, "MAUGrowth": 1481353, "Status": "red"}, {"Rank": 29, "GameName": "Traffic Rider", "Publisher": "SK Games", "Country": "Turkey", "Downloads": 22813461, "DownloadsGrowth": -1367796, "DownloadsGrowthPct": -5.66, "DAU": 977630, "DAUGrowth": 63917, "DAUGrowthPct": 7.0, "MAU": 7084443, "MAUGrowth": 330480, "Status": "yellow"}, {"Rank": 30, "GameName": "My Talking Tom Friends", "Publisher": "Outfit7 (Jinke Culture)", "Country": "Cyprus", "Downloads": 17128949, "DownloadsGrowth": -4349860, "DownloadsGrowthPct": -20.25, "DAU": 940291, "DAUGrowth": -256020, "DAUGrowthPct": -21.4, "MAU": 6599576, "MAUGrowth": -1409606, "Status": "red"}, {"Rank": 31, "GameName": "Tile Club - Match Puzzle Game", "Publisher": "GamoVation", "Country": "Netherlands", "Downloads": 20129955, "DownloadsGrowth": 10736639, "DownloadsGrowthPct": 114.3, "DAU": 886764, "DAUGrowth": 420180, "DAUGrowthPct": 90.05, "MAU": 3722645, "MAUGrowth": 2020173, "Status": "red"}, {"Rank": 32, "GameName": "Callbreak.com - Card game", "Publisher": "Teslatech", "Country": "Nepal", "Downloads": 6480106, "DownloadsGrowth": -409735, "DownloadsGrowthPct": -5.95, "DAU": 883198, "DAUGrowth": -139000, "DAUGrowthPct": -13.6, "MAU": 3299866, "MAUGrowth": -413612, "Status": "yellow"}, {"Rank": 33, "GameName": "Bubble Shooter - Classic Pop", "Publisher": "Miniclip", "Country": "Israel", "Downloads": 7129382, "DownloadsGrowth": 1818473, "DownloadsGrowthPct": 34.24, "DAU": 844740, "DAUGrowth": -435865, "DAUGrowthPct": -34.04, "MAU": 3636142, "MAUGrowth": -1425205, "Status": "red"}, {"Rank": 34, "GameName": "Going Balls", "Publisher": "ironSource", "Country": "Israel", "Downloads": 17065796, "DownloadsGrowth": -894556, "DownloadsGrowthPct": -4.98, "DAU": 839085, "DAUGrowth": 141911, "DAUGrowthPct": 20.36, "MAU": 6166743, "MAUGrowth": 846510, "Status": "yellow"}, {"Rank": 35, "GameName": "Shoot Bubble - Pop Bubbles", "Publisher": "Ivy Mobile", "Country": "Hong Kong", "Downloads": 14084231, "DownloadsGrowth": -7851597, "DownloadsGrowthPct": -35.79, "DAU": 827905, "DAUGrowth": -697308, "DAUGrowthPct": -45.72, "MAU": 4852312, "MAUGrowth": -2188614, "Status": "yellow"}, {"Rank": 36, "GameName": "8 Ball Pool", "Publisher": "Miniclip", "Country": "Switzerland", "Downloads": 9371746, "DownloadsGrowth": -2278878, "DownloadsGrowthPct": -19.56, "DAU": 823126, "DAUGrowth": -336274, "DAUGrowthPct": -29.0, "MAU": 4508947, "MAUGrowth": -1503638, "Status": "red"}, {"Rank": 37, "GameName": "Rope Hero: Vice Town", "Publisher": "Naxeex", "Country": "Cyprus", "Downloads": 17288229, "DownloadsGrowth": -2963502, "DownloadsGrowthPct": -14.63, "DAU": 816193, "DAUGrowth": -198996, "DAUGrowthPct": -19.6, "MAU": 5805456, "MAUGrowth": -395874, "Status": "yellow"}, {"Rank": 38, "GameName": "Snake Lite - Snake Game", "Publisher": "Hippo Games", "Country": "China", "Downloads": 26304331, "DownloadsGrowth": 4618608, "DownloadsGrowthPct": 21.3, "DAU": 816015, "DAUGrowth": 99114, "DAUGrowthPct": 13.83, "MAU": 6371717, "MAUGrowth": 1315727, "Status": "yellow"}, {"Rank": 39, "GameName": "Extreme Car Driving Simulator", "Publisher": "AxesInMotion", "Country": "Spain", "Downloads": 27477478, "DownloadsGrowth": 17227054, "DownloadsGrowthPct": 168.06, "DAU": 800481, "DAUGrowth": 184515, "DAUGrowthPct": 29.96, "MAU": 6732724, "MAUGrowth": 2206026, "Status": "yellow"}, {"Rank": 40, "GameName": "Pizza Ready!", "Publisher": "Supercent", "Country": "South Korea", "Downloads": 56789251, "DownloadsGrowth": 14743329, "DownloadsGrowthPct": 35.06, "DAU": 791529, "DAUGrowth": 246525, "DAUGrowthPct": 45.23, "MAU": 8295709, "MAUGrowth": 2801198, "Status": "yellow"}, {"Rank": 41, "GameName": "Temple Run", "Publisher": "Imangi Studios", "Country": "US", "Downloads": 18677289, "DownloadsGrowth": -8185451, "DownloadsGrowthPct": -30.47, "DAU": 775045, "DAUGrowth": -385149, "DAUGrowthPct": -33.2, "MAU": 6865671, "MAUGrowth": -2234230, "Status": "yellow"}, {"Rank": 42, "GameName": "Bus Simulator Indonesia", "Publisher": "Maleo", "Country": "Indonesia", "Downloads": 16492004, "DownloadsGrowth": 6306929, "DownloadsGrowthPct": 61.92, "DAU": 774815, "DAUGrowth": 166298, "DAUGrowthPct": 27.33, "MAU": 4906816, "MAUGrowth": 1376436, "Status": "yellow"}, {"Rank": 43, "GameName": "Township", "Publisher": "Playrix", "Country": "Ireland", "Downloads": 10374214, "DownloadsGrowth": 3868656, "DownloadsGrowthPct": 59.47, "DAU": 735169, "DAUGrowth": 73016, "DAUGrowthPct": 11.03, "MAU": 3002867, "MAUGrowth": 675653, "Status": "yellow"}, {"Rank": 44, "GameName": "FPS Strike Ops : Modern Arena", "Publisher": "FPS Shooter", "Country": "US", "Downloads": 35315428, "DownloadsGrowth": 32309238, "DownloadsGrowthPct": 1074.76, "DAU": 718757, "DAUGrowth": 674504, "DAUGrowthPct": 1524.2, "MAU": 5289492, "MAUGrowth": 4942251, "Status": "yellow"}, {"Rank": 45, "GameName": "1 2 3 4 Player Games - Offline", "Publisher": "JindoBlu", "Country": "Italy", "Downloads": 16754191, "DownloadsGrowth": 7821680, "DownloadsGrowthPct": 87.56, "DAU": 704555, "DAUGrowth": 326399, "DAUGrowthPct": 86.31, "MAU": 5231074, "MAUGrowth": 2531429, "Status": "yellow"}, {"Rank": 46, "GameName": "Cat Runner: Decorate Home", "Publisher": "Ivy Mobile", "Country": "Hong Kong", "Downloads": 20370126, "DownloadsGrowth": 4863846, "DownloadsGrowthPct": 31.37, "DAU": 701993, "DAUGrowth": 128629, "DAUGrowthPct": 22.43, "MAU": 4754152, "MAUGrowth": 1040075, "Status": "yellow"}, {"Rank": 47, "GameName": "eFootball", "Publisher": "Konami", "Country": "Japan", "Downloads": 2934668, "DownloadsGrowth": 694945, "DownloadsGrowthPct": 31.03, "DAU": 696207, "DAUGrowth": 98026, "DAUGrowthPct": 16.39, "MAU": 1617231, "MAUGrowth": 319129, "Status": "red"}, {"Rank": 48, "GameName": "Talking Tom Cat", "Publisher": "Outfit7 (Jinke Culture)", "Country": "Cyprus", "Downloads": 15866392, "DownloadsGrowth": -5726007, "DownloadsGrowthPct": -26.52, "DAU": 664422, "DAUGrowth": -188298, "DAUGrowthPct": -22.08, "MAU": 5520877, "MAUGrowth": -1029159, "Status": "red"}, {"Rank": 49, "GameName": "Fashion Show: Makeup, Dress Up", "Publisher": "Dress Up Games", "Country": "Vietnam", "Downloads": 23412842, "DownloadsGrowth": 15887223, "DownloadsGrowthPct": 211.11, "DAU": 657157, "DAUGrowth": 267191, "DAUGrowthPct": 68.52, "MAU": 5164909, "MAUGrowth": 2351016, "Status": "yellow"}, {"Rank": 50, "GameName": "Paper.io 2", "Publisher": "Voodoo", "Country": "France", "Downloads": 20114107, "DownloadsGrowth": 14401115, "DownloadsGrowthPct": 252.08, "DAU": 654201, "DAUGrowth": 484605, "DAUGrowthPct": 285.74, "MAU": 4285928, "MAUGrowth": 3037940, "Status": "red"}, {"Rank": 51, "GameName": "My Talking Tom", "Publisher": "Outfit7 (Jinke Culture)", "Country": "Cyprus", "Downloads": 13091453, "DownloadsGrowth": -4305391, "DownloadsGrowthPct": -24.75, "DAU": 653766, "DAUGrowth": -196292, "DAUGrowthPct": -23.09, "MAU": 4405542, "MAUGrowth": -887070, "Status": "red"}, {"Rank": 52, "GameName": "Car Race", "Publisher": "iKame", "Country": "Vietnam", "Downloads": 26785408, "DownloadsGrowth": 4477587, "DownloadsGrowthPct": 20.07, "DAU": 648506, "DAUGrowth": 104459, "DAUGrowthPct": 19.2, "MAU": 5329583, "MAUGrowth": 812582, "Status": "yellow"}, {"Rank": 53, "GameName": "Ludo Supreme Gold King - Zupee", "Publisher": "Zupee (Cashgrail Private Limited)", "Country": "India", "Downloads": 51829450, "DownloadsGrowth": -11250299, "DownloadsGrowthPct": -17.84, "DAU": 630368, "DAUGrowth": -25934, "DAUGrowthPct": -3.95, "MAU": 6826648, "MAUGrowth": -607281, "Status": "yellow"}, {"Rank": 54, "GameName": "Tile Explorer - Triple Match", "Publisher": "Oakever Games", "Country": "China", "Downloads": 14876978, "DownloadsGrowth": 14210985, "DownloadsGrowthPct": 2133.8, "DAU": 621799, "DAUGrowth": 609318, "DAUGrowthPct": 4881.96, "MAU": 2355784, "MAUGrowth": 2297073, "Status": "yellow"}, {"Rank": 55, "GameName": "Tic Tac Toe 2 Player: XO Game", "Publisher": "Onetap Global", "Country": "Singapore", "Downloads": 20462787, "DownloadsGrowth": 4580654, "DownloadsGrowthPct": 28.84, "DAU": 618695, "DAUGrowth": 291257, "DAUGrowthPct": 88.95, "MAU": 4525150, "MAUGrowth": 2111728, "Status": "yellow"}, {"Rank": 56, "GameName": "Gardenscapes", "Publisher": "Playrix", "Country": "Ireland", "Downloads": 8728714, "DownloadsGrowth": -720598, "DownloadsGrowthPct": -7.63, "DAU": 618666, "DAUGrowth": -99614, "DAUGrowthPct": -13.87, "MAU": 2469241, "MAUGrowth": -102097, "Status": "yellow"}, {"Rank": 57, "GameName": "Mob Control", "Publisher": "Voodoo", "Country": "France", "Downloads": 24754325, "DownloadsGrowth": 6860896, "DownloadsGrowthPct": 38.34, "DAU": 573174, "DAUGrowth": 190735, "DAUGrowthPct": 49.87, "MAU": 4717783, "MAUGrowth": 1699690, "Status": "red"}, {"Rank": 58, "GameName": "My Talking Angela 2", "Publisher": "Outfit7 (Jinke Culture)", "Country": "Cyprus", "Downloads": 8681831, "DownloadsGrowth": -3761783, "DownloadsGrowthPct": -30.23, "DAU": 573117, "DAUGrowth": -154632, "DAUGrowthPct": -21.25, "MAU": 4222806, "MAUGrowth": -561154, "Status": "red"}, {"Rank": 59, "GameName": "Dream Cricket 2025", "Publisher": "Dream11", "Country": "India", "Downloads": 10427639, "DownloadsGrowth": 6398170, "DownloadsGrowthPct": 158.78, "DAU": 563886, "DAUGrowth": 426882, "DAUGrowthPct": 311.58, "MAU": 2677202, "MAUGrowth": 1937840, "Status": "yellow"}, {"Rank": 60, "GameName": "Candy Crush Soda Saga", "Publisher": "Microsoft", "Country": "United Kingdom", "Downloads": 7272094, "DownloadsGrowth": -831559, "DownloadsGrowthPct": -10.26, "DAU": 557618, "DAUGrowth": -196324, "DAUGrowthPct": -26.04, "MAU": 2119992, "MAUGrowth": -357937, "Status": "red"}, {"Rank": 61, "GameName": "Bridge Race", "Publisher": "ironSource", "Country": "Israel", "Downloads": 18498203, "DownloadsGrowth": -2845118, "DownloadsGrowthPct": -13.33, "DAU": 556577, "DAUGrowth": -177198, "DAUGrowthPct": -24.15, "MAU": 5654384, "MAUGrowth": -858719, "Status": "yellow"}, {"Rank": 62, "GameName": "Piano Kids - Music & Songs", "Publisher": "Orange Studios Games", "Country": "Argentina", "Downloads": 8172369, "DownloadsGrowth": -1754784, "DownloadsGrowthPct": -17.68, "DAU": 552902, "DAUGrowth": -91743, "DAUGrowthPct": -14.23, "MAU": 3843546, "MAUGrowth": -455956, "Status": "red"}, {"Rank": 63, "GameName": "Race Master 3D: Car Racing", "Publisher": "Beresnev Games", "Country": "Czech Republic", "Downloads": 12910702, "DownloadsGrowth": -11998529, "DownloadsGrowthPct": -48.17, "DAU": 547354, "DAUGrowth": -270212, "DAUGrowthPct": -33.05, "MAU": 4327529, "MAUGrowth": -1624885, "Status": "yellow"}, {"Rank": 64, "GameName": "Granny", "Publisher": "DVloper", "Country": "Sweden", "Downloads": 23992333, "DownloadsGrowth": 4125313, "DownloadsGrowthPct": 20.76, "DAU": 539962, "DAUGrowth": 49560, "DAUGrowthPct": 10.11, "MAU": 4982824, "MAUGrowth": 761022, "Status": "yellow"}, {"Rank": 65, "GameName": "Call of Duty: Mobile", "Publisher": "Microsoft", "Country": "US", "Downloads": 4731971, "DownloadsGrowth": 351805, "DownloadsGrowthPct": 8.03, "DAU": 537428, "DAUGrowth": -17996, "DAUGrowthPct": -3.24, "MAU": 2055997, "MAUGrowth": -6820, "Status": "red"}, {"Rank": 66, "GameName": "Ludo", "Publisher": "Yarsa Games", "Country": "Nepal", "Downloads": 6374302, "DownloadsGrowth": -9162888, "DownloadsGrowthPct": -58.97, "DAU": 536016, "DAUGrowth": -218880, "DAUGrowthPct": -28.99, "MAU": 3086954, "MAUGrowth": -1244761, "Status": "yellow"}, {"Rank": 67, "GameName": "Indian Theft Aura Simulator", "Publisher": "Rebel Gaming Studio", "Country": "India", "Downloads": 16511315, "DownloadsGrowth": 12281603, "DownloadsGrowthPct": 290.37, "DAU": 531160, "DAUGrowth": 442961, "DAUGrowthPct": 502.23, "MAU": 3358621, "MAUGrowth": 2784123, "Status": "yellow"}, {"Rank": 68, "GameName": "Chess - Offline Board Game", "Publisher": "GamoVation", "Country": "Netherlands", "Downloads": 14217384, "DownloadsGrowth": 5137531, "DownloadsGrowthPct": 56.58, "DAU": 525768, "DAUGrowth": 232645, "DAUGrowthPct": 79.37, "MAU": 4192959, "MAUGrowth": 1863421, "Status": "red"}, {"Rank": 69, "GameName": "Snake Clash!", "Publisher": "Supercent", "Country": "South Korea", "Downloads": 17683443, "DownloadsGrowth": 12089054, "DownloadsGrowthPct": 216.09, "DAU": 512392, "DAUGrowth": 357570, "DAUGrowthPct": 230.96, "MAU": 3600501, "MAUGrowth": 2604118, "Status": "red"}, {"Rank": 70, "GameName": "Coin Master", "Publisher": "Moon Active", "Country": "Israel", "Downloads": 3360022, "DownloadsGrowth": -1009136, "DownloadsGrowthPct": -23.1, "DAU": 502545, "DAUGrowth": 53320, "DAUGrowthPct": 11.87, "MAU": 1222217, "MAUGrowth": 108097, "Status": "yellow"}, {"Rank": 71, "GameName": "Offline Games No WiFi internet", "Publisher": "Fun Offline Games", "Country": "Russia", "Downloads": 14842382, "DownloadsGrowth": 10104773, "DownloadsGrowthPct": 213.29, "DAU": 479755, "DAUGrowth": 360307, "DAUGrowthPct": 301.64, "MAU": 3122966, "MAUGrowth": 2365663, "Status": "red"}, {"Rank": 72, "GameName": "Soccer Superstar", "Publisher": "Real Freestyle Soccer", "Country": "Hong Kong", "Downloads": 9078124, "DownloadsGrowth": -2698590, "DownloadsGrowthPct": -22.91, "DAU": 474345, "DAUGrowth": -32742, "DAUGrowthPct": -6.46, "MAU": 3294654, "MAUGrowth": -100256, "Status": "yellow"}, {"Rank": 73, "GameName": "Unscrew Nuts Sort: Pin Puzzle", "Publisher": "Pleasure City", "Country": "Hong Kong", "Downloads": 9745388, "DownloadsGrowth": 8876373, "DownloadsGrowthPct": 1021.43, "DAU": 465938, "DAUGrowth": 448695, "DAUGrowthPct": 2602.19, "MAU": 1861592, "MAUGrowth": 1776706, "Status": "red"}, {"Rank": 74, "GameName": "Block Puzzle Jewel", "Publisher": "Hua Weiwei", "Country": "China", "Downloads": 2068236, "DownloadsGrowth": -1290436, "DownloadsGrowthPct": -38.42, "DAU": 463868, "DAUGrowth": -126857, "DAUGrowthPct": -21.47, "MAU": 1758171, "MAUGrowth": -541094, "Status": "red"}, {"Rank": 75, "GameName": "Art Puzzle - Jigsaw Art Games", "Publisher": "Miniclip", "Country": "Cyprus", "Downloads": 21536724, "DownloadsGrowth": 15925008, "DownloadsGrowthPct": 283.78, "DAU": 448777, "DAUGrowth": 271534, "DAUGrowthPct": 153.2, "MAU": 3165667, "MAUGrowth": 1918267, "Status": "red"}, {"Rank": 76, "GameName": "Bubble Shooter: Bubble Pop", "Publisher": "HDuo Fun Games", "Country": "Hong Kong", "Downloads": 10662741, "DownloadsGrowth": 2935890, "DownloadsGrowthPct": 38.0, "DAU": 446130, "DAUGrowth": 83487, "DAUGrowthPct": 23.02, "MAU": 2483771, "MAUGrowth": 863946, "Status": "yellow"}, {"Rank": 77, "GameName": "Hole.io", "Publisher": "Voodoo", "Country": "France", "Downloads": 26061037, "DownloadsGrowth": 15189191, "DownloadsGrowthPct": 139.71, "DAU": 443546, "DAUGrowth": 286653, "DAUGrowthPct": 182.71, "MAU": 4804495, "MAUGrowth": 3080170, "Status": "red"}, {"Rank": 78, "GameName": "Spider Fighter 3: Action Game", "Publisher": "Starplay FZCO", "Country": "United Arab Emirates", "Downloads": 16874875, "DownloadsGrowth": 2784595, "DownloadsGrowthPct": 19.76, "DAU": 437562, "DAUGrowth": 178227, "DAUGrowthPct": 68.72, "MAU": 3702692, "MAUGrowth": 1538023, "Status": "red"}, {"Rank": 79, "GameName": "Teen Patti GOLD: 3 Patti Rummy", "Publisher": "Stillfront Group", "Country": "India", "Downloads": 6597197, "DownloadsGrowth": -3261379, "DownloadsGrowthPct": -33.08, "DAU": 436153, "DAUGrowth": -224257, "DAUGrowthPct": -33.96, "MAU": 1923331, "MAUGrowth": -460168, "Status": "yellow"}, {"Rank": 80, "GameName": "Antistress - relaxation toys", "Publisher": "JindoBlu", "Country": "Italy", "Downloads": 7519547, "DownloadsGrowth": -3792052, "DownloadsGrowthPct": -33.52, "DAU": 435600, "DAUGrowth": -222757, "DAUGrowthPct": -33.84, "MAU": 3332904, "MAUGrowth": -1305997, "Status": "red"}, {"Rank": 81, "GameName": "Indian Rummy : Play Rummy Game", "Publisher": "PokerStars", "Country": "India", "Downloads": 9767548, "DownloadsGrowth": -7465262, "DownloadsGrowthPct": -43.32, "DAU": 434426, "DAUGrowth": -144713, "DAUGrowthPct": -24.99, "MAU": 2218666, "MAUGrowth": -547956, "Status": "red"}, {"Rank": 82, "GameName": "Blossom Match - Puzzle Game", "Publisher": "Tripledot Studios", "Country": "United Kingdom", "Downloads": 6399068, "DownloadsGrowth": 1639038, "DownloadsGrowthPct": 34.43, "DAU": 428738, "DAUGrowth": 320020, "DAUGrowthPct": 294.36, "MAU": 1511018, "MAUGrowth": 996121, "Status": "red"}, {"Rank": 83, "GameName": "Numpuz: Number Puzzle Games", "Publisher": "HDuo Fun Games", "Country": "Hong Kong", "Downloads": 5621115, "DownloadsGrowth": -2868146, "DownloadsGrowthPct": -33.79, "DAU": 422821, "DAUGrowth": -89740, "DAUGrowthPct": -17.51, "MAU": 2684940, "MAUGrowth": -357699, "Status": "red"}, {"Rank": 84, "GameName": "Mini Militia - War.io", "Publisher": "Miniclip", "Country": "Switzerland", "Downloads": 7443127, "DownloadsGrowth": -1777990, "DownloadsGrowthPct": -19.28, "DAU": 415241, "DAUGrowth": -148449, "DAUGrowthPct": -26.34, "MAU": 2961539, "MAUGrowth": -931963, "Status": "red"}, {"Rank": 85, "GameName": "Tractor Game 3d Indian Farming", "Publisher": "Right Solution", "Country": "Pakistan", "Downloads": 2919864, "DownloadsGrowth": -1566445, "DownloadsGrowthPct": -34.92, "DAU": 413837, "DAUGrowth": 144090, "DAUGrowthPct": 53.42, "MAU": 2275348, "MAUGrowth": 459717, "Status": "yellow"}, {"Rank": 86, "GameName": "Real Tractor Farming Games", "Publisher": "Solo Studio", "Country": "United Kingdom", "Downloads": 4241162, "DownloadsGrowth": -703577, "DownloadsGrowthPct": -14.23, "DAU": 411498, "DAUGrowth": 149911, "DAUGrowthPct": 57.31, "MAU": 2643779, "MAUGrowth": 831980, "Status": "yellow"}, {"Rank": 87, "GameName": "Hill Climb Racing 2", "Publisher": "Fingersoft", "Country": "Finland", "Downloads": 11367985, "DownloadsGrowth": -4076063, "DownloadsGrowthPct": -26.39, "DAU": 407252, "DAUGrowth": -97848, "DAUGrowthPct": -19.37, "MAU": 2812446, "MAUGrowth": -501949, "Status": "yellow"}, {"Rank": 88, "GameName": "Dream League Soccer 2026", "Publisher": "First Touch Games", "Country": "United Kingdom", "Downloads": 2289766, "DownloadsGrowth": 528329, "DownloadsGrowthPct": 29.99, "DAU": 395677, "DAUGrowth": -8309, "DAUGrowthPct": -2.06, "MAU": 1222460, "MAUGrowth": 30758, "Status": "yellow"}, {"Rank": 89, "GameName": "Clash Royale", "Publisher": "Supercell", "Country": "Finland", "Downloads": 1095458, "DownloadsGrowth": 282041, "DownloadsGrowthPct": 34.67, "DAU": 385101, "DAUGrowth": 8881, "DAUGrowthPct": 2.36, "MAU": 917765, "MAUGrowth": -4008, "Status": "red"}, {"Rank": 90, "GameName": "Girl Rescue: Dragon Out!", "Publisher": "Wonder Group Holdings", "Country": "China", "Downloads": 8501455, "DownloadsGrowth": 8501455, "DownloadsGrowthPct": 0, "DAU": 380406, "DAUGrowth": 380406, "DAUGrowthPct": 0, "MAU": 1449233, "MAUGrowth": 1449233, "Status": "red"}, {"Rank": 91, "GameName": "Teen Patti Octro Poker & Rummy", "Publisher": "Octro", "Country": "India", "Downloads": 3733047, "DownloadsGrowth": 767427, "DownloadsGrowthPct": 25.88, "DAU": 378578, "DAUGrowth": 20789, "DAUGrowthPct": 5.81, "MAU": 1129756, "MAUGrowth": -180612, "Status": "yellow"}, {"Rank": 92, "GameName": "AHA Games: 10K+ Offline Games", "Publisher": "AHA Games", "Country": "Hong Kong", "Downloads": 852082, "DownloadsGrowth": 775129, "DownloadsGrowthPct": 1007.28, "DAU": 374847, "DAUGrowth": 367892, "DAUGrowthPct": 5289.6, "MAU": 504218, "MAUGrowth": 493089, "Status": "red"}, {"Rank": 93, "GameName": "Coloring Games: Color & Paint", "Publisher": "RV AppStudios", "Country": "US", "Downloads": 6714836, "DownloadsGrowth": -2299747, "DownloadsGrowthPct": -25.51, "DAU": 373981, "DAUGrowth": -43766, "DAUGrowthPct": -10.48, "MAU": 2966949, "MAUGrowth": -343479, "Status": "red"}, {"Rank": 94, "GameName": "WinZO: Play Games & Watch TV", "Publisher": "WinZO", "Country": "India", "Downloads": 39454437, "DownloadsGrowth": 901035, "DownloadsGrowthPct": 2.34, "DAU": 373878, "DAUGrowth": 171902, "DAUGrowthPct": 85.11, "MAU": 5761102, "MAUGrowth": 1901300, "Status": "red"}, {"Rank": 95, "GameName": "Talking Tom Gold Run", "Publisher": "Outfit7 (Jinke Culture)", "Country": "Cyprus", "Downloads": 5886623, "DownloadsGrowth": -882511, "DownloadsGrowthPct": -13.04, "DAU": 373405, "DAUGrowth": -210379, "DAUGrowthPct": -36.04, "MAU": 2313652, "MAUGrowth": -888461, "Status": "red"}, {"Rank": 96, "GameName": "Bird Sort 2: Color Puzzle", "Publisher": "Onesoft", "Country": "Vietnam", "Downloads": 9948051, "DownloadsGrowth": 8354094, "DownloadsGrowthPct": 524.11, "DAU": 370482, "DAUGrowth": 339096, "DAUGrowthPct": 1080.41, "MAU": 1875739, "MAUGrowth": 1682812, "Status": "red"}, {"Rank": 97, "GameName": "Football League 2026", "Publisher": "Mobile Soccer", "Country": "Singapore", "Downloads": 6926442, "DownloadsGrowth": -1792852, "DownloadsGrowthPct": -20.56, "DAU": 364908, "DAUGrowth": -11072, "DAUGrowthPct": -2.94, "MAU": 2148727, "MAUGrowth": -87916, "Status": "yellow"}, {"Rank": 98, "GameName": "Real Cricket 20", "Publisher": "Nautilus Mobile", "Country": "India", "Downloads": 5705175, "DownloadsGrowth": 219634, "DownloadsGrowthPct": 4.0, "DAU": 359685, "DAUGrowth": 22706, "DAUGrowthPct": 6.74, "MAU": 1827469, "MAUGrowth": 120076, "Status": "yellow"}, {"Rank": 99, "GameName": "King Of Cricket Games", "Publisher": "Cricket Games", "Country": "India", "Downloads": 13133549, "DownloadsGrowth": 3191995, "DownloadsGrowthPct": 32.11, "DAU": 356558, "DAUGrowth": 106981, "DAUGrowthPct": 42.86, "MAU": 2506675, "MAUGrowth": 851246, "Status": "yellow"}, {"Rank": 100, "GameName": "Pokemon GO", "Publisher": "Scopely", "Country": "US", "Downloads": 3244334, "DownloadsGrowth": -905019, "DownloadsGrowthPct": -21.81, "DAU": 356123, "DAUGrowth": -112314, "DAUGrowthPct": -23.98, "MAU": 1681090, "MAUGrowth": -231030, "Status": "red"}, {"Rank": 101, "GameName": "Bubble Shooter Rainbow", "Publisher": "52 Entertainment", "Country": "Spain", "Downloads": 6519103, "DownloadsGrowth": -5731041, "DownloadsGrowthPct": -46.78, "DAU": 352259, "DAUGrowth": -298201, "DAUGrowthPct": -45.84, "MAU": 2280472, "MAUGrowth": -1080614, "Status": "yellow"}, {"Rank": 102, "GameName": "Kids Games: For Toddlers 3-5", "Publisher": "RV AppStudios", "Country": "US", "Downloads": 6124839, "DownloadsGrowth": -4532979, "DownloadsGrowthPct": -42.53, "DAU": 347668, "DAUGrowth": -38104, "DAUGrowthPct": -9.88, "MAU": 2640552, "MAUGrowth": -541436, "Status": "red"}, {"Rank": 103, "GameName": "Paint by Number: Coloring Game", "Publisher": "Oakever Games", "Country": "China", "Downloads": 10174451, "DownloadsGrowth": 5656235, "DownloadsGrowthPct": 125.19, "DAU": 344615, "DAUGrowth": 119882, "DAUGrowthPct": 53.34, "MAU": 2314498, "MAUGrowth": 866493, "Status": "red"}, {"Rank": 104, "GameName": "FRAG Pro Shooter", "Publisher": "Oh BiBi", "Country": "France", "Downloads": 8709885, "DownloadsGrowth": -3271774, "DownloadsGrowthPct": -27.31, "DAU": 344089, "DAUGrowth": -106269, "DAUGrowthPct": -23.6, "MAU": 2426925, "MAUGrowth": -556236, "Status": "red"}, {"Rank": 105, "GameName": "Payback 2 - The Battle Sandbox", "Publisher": "Apex Designs Games", "Country": "United Kingdom", "Downloads": 7666356, "DownloadsGrowth": -3877438, "DownloadsGrowthPct": -33.59, "DAU": 340216, "DAUGrowth": -113190, "DAUGrowthPct": -24.96, "MAU": 2232036, "MAUGrowth": -562817, "Status": "red"}, {"Rank": 106, "GameName": "Farm Tractor Farming Games 3D", "Publisher": "Chromic Apps", "Country": "Pakistan", "Downloads": 1603502, "DownloadsGrowth": -4511948, "DownloadsGrowthPct": -73.78, "DAU": 339857, "DAUGrowth": 66294, "DAUGrowthPct": 24.23, "MAU": 2365680, "MAUGrowth": 439591, "Status": "yellow"}, {"Rank": 107, "GameName": "Kids Coloring Pages For Boys", "Publisher": "Piggy Panda", "Country": "US", "Downloads": 2389862, "DownloadsGrowth": -861586, "DownloadsGrowthPct": -26.5, "DAU": 339234, "DAUGrowth": 26725, "DAUGrowthPct": 8.55, "MAU": 2847868, "MAUGrowth": 481498, "Status": "red"}, {"Rank": 108, "GameName": "Arrows Puzzle Escape", "Publisher": "Lessmore", "Country": "Germany", "Downloads": 4521648, "DownloadsGrowth": 4521648, "DownloadsGrowthPct": 0, "DAU": 337917, "DAUGrowth": 337917, "DAUGrowthPct": 0, "MAU": 763542, "MAUGrowth": 763542, "Status": "red"}, {"Rank": 109, "GameName": "Ball Sort Puzzle - Color Game", "Publisher": "Guru Puzzle Game", "Country": "Singapore", "Downloads": 5458312, "DownloadsGrowth": 1772163, "DownloadsGrowthPct": 48.08, "DAU": 325819, "DAUGrowth": 174062, "DAUGrowthPct": 114.7, "MAU": 1957589, "MAUGrowth": 1196646, "Status": "red"}, {"Rank": 110, "GameName": "Homescapes: Match 3 Games", "Publisher": "Playrix", "Country": "Ireland", "Downloads": 3467825, "DownloadsGrowth": -588734, "DownloadsGrowthPct": -14.51, "DAU": 325495, "DAUGrowth": -74401, "DAUGrowthPct": -18.61, "MAU": 1316970, "MAUGrowth": -313420, "Status": "yellow"}, {"Rank": 111, "GameName": "Talking Tom: Hero Dash Run", "Publisher": "Outfit7 (Jinke Culture)", "Country": "Cyprus", "Downloads": 6169752, "DownloadsGrowth": -2443682, "DownloadsGrowthPct": -28.37, "DAU": 324021, "DAUGrowth": -135507, "DAUGrowthPct": -29.49, "MAU": 2445084, "MAUGrowth": -868160, "Status": "red"}, {"Rank": 112, "GameName": "World Cricket Championship 2", "Publisher": "Nextwave Multimedia", "Country": "India", "Downloads": 5574659, "DownloadsGrowth": 272943, "DownloadsGrowthPct": 5.15, "DAU": 320857, "DAUGrowth": -2179, "DAUGrowthPct": -0.67, "MAU": 1878990, "MAUGrowth": 149767, "Status": "yellow"}, {"Rank": 113, "GameName": "Bubble Shooter Relaxing", "Publisher": "Mint Games", "Country": "China", "Downloads": 0, "DownloadsGrowth": -86780, "DownloadsGrowthPct": -100.0, "DAU": 320297, "DAUGrowth": 139191, "DAUGrowthPct": 76.86, "MAU": 2094864, "MAUGrowth": 1030609, "Status": "red"}, {"Rank": 114, "GameName": "Granny 3", "Publisher": "DVloper", "Country": "Sweden", "Downloads": 16699326, "DownloadsGrowth": -1513544, "DownloadsGrowthPct": -8.31, "DAU": 318193, "DAUGrowth": -34806, "DAUGrowthPct": -9.86, "MAU": 3326026, "MAUGrowth": -44763, "Status": "yellow"}, {"Rank": 115, "GameName": "Tower War - Tactical Conquest", "Publisher": "SayGames", "Country": "Cyprus", "Downloads": 9003300, "DownloadsGrowth": -616825, "DownloadsGrowthPct": -6.41, "DAU": 316240, "DAUGrowth": -20455, "DAUGrowthPct": -6.08, "MAU": 1835755, "MAUGrowth": 128115, "Status": "red"}, {"Rank": 116, "GameName": "Indian Tractor Tochan Game 3d", "Publisher": "Right Solution", "Country": "Pakistan", "Downloads": 3976588, "DownloadsGrowth": 919581, "DownloadsGrowthPct": 30.08, "DAU": 315225, "DAUGrowth": 221001, "DAUGrowthPct": 234.55, "MAU": 2158082, "MAUGrowth": 1452923, "Status": "yellow"}, {"Rank": 117, "GameName": "Among Us", "Publisher": "Innersloth", "Country": "US", "Downloads": 4902366, "DownloadsGrowth": 31076, "DownloadsGrowthPct": 0.64, "DAU": 312949, "DAUGrowth": 28057, "DAUGrowthPct": 9.85, "MAU": 2703232, "MAUGrowth": 275286, "Status": "red"}, {"Rank": 118, "GameName": "School Party Craft", "Publisher": "Candy Room Games", "Country": "Ukraine", "Downloads": 8314016, "DownloadsGrowth": 3009753, "DownloadsGrowthPct": 56.74, "DAU": 312329, "DAUGrowth": 26800, "DAUGrowthPct": 9.39, "MAU": 2229619, "MAUGrowth": 480948, "Status": "red"}, {"Rank": 119, "GameName": "Wood Screw Puzzle", "Publisher": "iKame", "Country": "Vietnam", "Downloads": 5890046, "DownloadsGrowth": -26456321, "DownloadsGrowthPct": -81.79, "DAU": 309072, "DAUGrowth": -551764, "DAUGrowthPct": -64.1, "MAU": 2410333, "MAUGrowth": -3208247, "Status": "red"}, {"Rank": 120, "GameName": "Indian Tractor Simulator Game", "Publisher": "Byte Raft", "Country": "India", "Downloads": 2296291, "DownloadsGrowth": 12826, "DownloadsGrowthPct": 0.56, "DAU": 303138, "DAUGrowth": 167240, "DAUGrowthPct": 123.06, "MAU": 2344954, "MAUGrowth": 1180111, "Status": "yellow"}, {"Rank": 121, "GameName": "Build A Queen", "Publisher": "ironSource", "Country": "Israel", "Downloads": 14534987, "DownloadsGrowth": -6601298, "DownloadsGrowthPct": -31.23, "DAU": 302243, "DAUGrowth": -36677, "DAUGrowthPct": -10.82, "MAU": 3086864, "MAUGrowth": -264545, "Status": "red"}, {"Rank": 122, "GameName": "Granny: Chapter Two", "Publisher": "DVloper", "Country": "Sweden", "Downloads": 11412610, "DownloadsGrowth": -1183490, "DownloadsGrowthPct": -9.4, "DAU": 300783, "DAUGrowth": -14819, "DAUGrowthPct": -4.7, "MAU": 2819710, "MAUGrowth": 71148, "Status": "red"}, {"Rank": 123, "GameName": "Ludo Club - Fun Dice Game", "Publisher": "Stillfront Group", "Country": "India", "Downloads": 3137632, "DownloadsGrowth": -2394252, "DownloadsGrowthPct": -43.28, "DAU": 299473, "DAUGrowth": -178601, "DAUGrowthPct": -37.36, "MAU": 1549029, "MAUGrowth": -472020, "Status": "yellow"}, {"Rank": 124, "GameName": "Card Game 29", "Publisher": "Z Level Labs", "Country": "India", "Downloads": 749868, "DownloadsGrowth": -389829, "DownloadsGrowthPct": -34.2, "DAU": 297522, "DAUGrowth": -25342, "DAUGrowthPct": -7.85, "MAU": 867050, "MAUGrowth": -79264, "Status": "yellow"}, {"Rank": 125, "GameName": "Chess", "Publisher": "Chess Prince", "Country": "Russia", "Downloads": 3790580, "DownloadsGrowth": -6014313, "DownloadsGrowthPct": -61.34, "DAU": 297493, "DAUGrowth": -150220, "DAUGrowthPct": -33.55, "MAU": 2399965, "MAUGrowth": -1179467, "Status": "red"}, {"Rank": 126, "GameName": "American Truck Cargo Games Sim", "Publisher": "Chromic Apps", "Country": "Pakistan", "Downloads": 2923407, "DownloadsGrowth": 2311133, "DownloadsGrowthPct": 377.47, "DAU": 297249, "DAUGrowth": 273223, "DAUGrowthPct": 1137.2, "MAU": 1966648, "MAUGrowth": 1786250, "Status": "yellow"}, {"Rank": 127, "GameName": "Words of Wonders: Crossword", "Publisher": "Fugo Games", "Country": "Turkey", "Downloads": 5703297, "DownloadsGrowth": 972257, "DownloadsGrowthPct": 20.55, "DAU": 296934, "DAUGrowth": -24541, "DAUGrowthPct": -7.63, "MAU": 1774112, "MAUGrowth": -20751, "Status": "red"}, {"Rank": 128, "GameName": "Vehicle Masters", "Publisher": "SayGames", "Country": "Cyprus", "Downloads": 16373524, "DownloadsGrowth": 1269712, "DownloadsGrowthPct": 8.41, "DAU": 295300, "DAUGrowth": 30786, "DAUGrowthPct": 11.64, "MAU": 2868578, "MAUGrowth": 537495, "Status": "red"}, {"Rank": 129, "GameName": "Ramp Car Games: GT Car Stunts", "Publisher": "Fun Drive Games", "Country": "Pakistan", "Downloads": 21392107, "DownloadsGrowth": -16522490, "DownloadsGrowthPct": -43.58, "DAU": 294553, "DAUGrowth": -130175, "DAUGrowthPct": -30.65, "MAU": 3296974, "MAUGrowth": -1339431, "Status": "yellow"}, {"Rank": 130, "GameName": "Racing in Car 2", "Publisher": "ckgames", "Country": "Turkey", "Downloads": 14840135, "DownloadsGrowth": 3383723, "DownloadsGrowthPct": 29.54, "DAU": 292355, "DAUGrowth": -57012, "DAUGrowthPct": -16.32, "MAU": 2646636, "MAUGrowth": -293376, "Status": "red"}, {"Rank": 131, "GameName": "Ludo Talent - Game & Chatroom", "Publisher": "Spring Technology", "Country": "Vietnam", "Downloads": 3210251, "DownloadsGrowth": -909365, "DownloadsGrowthPct": -22.07, "DAU": 291854, "DAUGrowth": -1191, "DAUGrowthPct": -0.41, "MAU": 1355870, "MAUGrowth": -109593, "Status": "red"}, {"Rank": 132, "GameName": "Minecraft: Dream it, Build it!", "Publisher": "Microsoft", "Country": "Sweden", "Downloads": 9329745, "DownloadsGrowth": 1037487, "DownloadsGrowthPct": 12.51, "DAU": 291785, "DAUGrowth": 103186, "DAUGrowthPct": 54.71, "MAU": 2496058, "MAUGrowth": 598968, "Status": "red"}, {"Rank": 133, "GameName": "My Talking Angela", "Publisher": "Outfit7 (Jinke Culture)", "Country": "Cyprus", "Downloads": 5734450, "DownloadsGrowth": -2807787, "DownloadsGrowthPct": -32.87, "DAU": 290304, "DAUGrowth": -176413, "DAUGrowthPct": -37.8, "MAU": 2172908, "MAUGrowth": -880048, "Status": "red"}, {"Rank": 134, "GameName": "Stickman Party 234 MiniGames", "Publisher": "PlayMax Game Studio", "Country": "Russia", "Downloads": 5777736, "DownloadsGrowth": 743568, "DownloadsGrowthPct": 14.77, "DAU": 290114, "DAUGrowth": 39607, "DAUGrowthPct": 15.81, "MAU": 2057534, "MAUGrowth": 317538, "Status": "red"}, {"Rank": 135, "GameName": "UNO!", "Publisher": "Mattel163", "Country": "Hong Kong", "Downloads": 9283721, "DownloadsGrowth": 2573352, "DownloadsGrowthPct": 38.35, "DAU": 286851, "DAUGrowth": 78984, "DAUGrowthPct": 38.0, "MAU": 2115644, "MAUGrowth": 639518, "Status": "red"}, {"Rank": 136, "GameName": "Vita Mahjong", "Publisher": "Vita Studio", "Country": "Hong Kong", "Downloads": 10047669, "DownloadsGrowth": 9475216, "DownloadsGrowthPct": 1655.2, "DAU": 284895, "DAUGrowth": 278798, "DAUGrowthPct": 4572.71, "MAU": 1391406, "MAUGrowth": 1328442, "Status": "red"}, {"Rank": 137, "GameName": "Block Craft 3D: Building Game", "Publisher": "Wildlife Studios", "Country": "Brazil", "Downloads": 9252505, "DownloadsGrowth": -1768913, "DownloadsGrowthPct": -16.05, "DAU": 279092, "DAUGrowth": -31379, "DAUGrowthPct": -10.11, "MAU": 2440010, "MAUGrowth": -207313, "Status": "red"}, {"Rank": 138, "GameName": "RummyCircle: Real Cash Rummy", "Publisher": "Games24x7", "Country": "India", "Downloads": 12237838, "DownloadsGrowth": -22630166, "DownloadsGrowthPct": -64.9, "DAU": 278469, "DAUGrowth": -105303, "DAUGrowthPct": -27.44, "MAU": 2368716, "MAUGrowth": -1021815, "Status": "red"}, {"Rank": 139, "GameName": "Annoying Uncle Punch Game", "Publisher": "Game District", "Country": "Pakistan", "Downloads": 17553950, "DownloadsGrowth": 16046814, "DownloadsGrowthPct": 1064.72, "DAU": 275924, "DAUGrowth": 263364, "DAUGrowthPct": 2096.85, "MAU": 2444394, "MAUGrowth": 2316123, "Status": "yellow"}, {"Rank": 140, "GameName": "Magic Tiles 3 - Piano Game", "Publisher": "Amanotes", "Country": "Vietnam", "Downloads": 8656825, "DownloadsGrowth": -2218315, "DownloadsGrowthPct": -20.4, "DAU": 271787, "DAUGrowth": -27881, "DAUGrowthPct": -9.3, "MAU": 2984762, "MAUGrowth": -341244, "Status": "red"}, {"Rank": 141, "GameName": "Rollance : Adventure Balls", "Publisher": "Azur Interactive Games", "Country": "Cyprus", "Downloads": 12341469, "DownloadsGrowth": -5877944, "DownloadsGrowthPct": -32.26, "DAU": 269016, "DAUGrowth": -15735, "DAUGrowthPct": -5.53, "MAU": 2278784, "MAUGrowth": -175395, "Status": "red"}, {"Rank": 142, "GameName": "Stumble Guys", "Publisher": "Scopely", "Country": "US", "Downloads": 4801864, "DownloadsGrowth": -1234264, "DownloadsGrowthPct": -20.45, "DAU": 261828, "DAUGrowth": -131338, "DAUGrowthPct": -33.41, "MAU": 1907411, "MAUGrowth": -650111, "Status": "red"}, {"Rank": 143, "GameName": "Water Sort Puzzle - Sort Color", "Publisher": "Guru Puzzle Game", "Country": "Singapore", "Downloads": 5073911, "DownloadsGrowth": -732698, "DownloadsGrowthPct": -12.62, "DAU": 261548, "DAUGrowth": -38050, "DAUGrowthPct": -12.7, "MAU": 1616605, "MAUGrowth": -62786, "Status": "red"}, {"Rank": 144, "GameName": "Mini Relaxing Game- pop it", "Publisher": "Stick Hunter", "Country": "United Arab Emirates", "Downloads": 15703965, "DownloadsGrowth": 11493995, "DownloadsGrowthPct": 273.02, "DAU": 259290, "DAUGrowth": 216222, "DAUGrowthPct": 502.05, "MAU": 2496716, "MAUGrowth": 2000449, "Status": "red"}, {"Rank": 145, "GameName": "Stunt Bike Extreme", "Publisher": "Hyperkani", "Country": "Finland", "Downloads": 9198909, "DownloadsGrowth": -2343510, "DownloadsGrowthPct": -20.3, "DAU": 258039, "DAUGrowth": 21204, "DAUGrowthPct": 8.95, "MAU": 1719890, "MAUGrowth": 116214, "Status": "red"}, {"Rank": 146, "GameName": "Bus Simulator Game - Bus Games", "Publisher": "Infinite Earth", "Country": "United Arab Emirates", "Downloads": 2483249, "DownloadsGrowth": -3224826, "DownloadsGrowthPct": -56.5, "DAU": 251121, "DAUGrowth": 84566, "DAUGrowthPct": 50.77, "MAU": 2435662, "MAUGrowth": 761670, "Status": "red"}, {"Rank": 147, "GameName": "Asphalt 8", "Publisher": "Gameloft", "Country": "France", "Downloads": 12978498, "DownloadsGrowth": -3879027, "DownloadsGrowthPct": -23.01, "DAU": 248970, "DAUGrowth": -15296, "DAUGrowthPct": -5.79, "MAU": 2802729, "MAUGrowth": -118614, "Status": "red"}, {"Rank": 148, "GameName": "Drive Zone: Car Simulator Game", "Publisher": "Jet Games", "Country": "United Arab Emirates", "Downloads": 9006286, "DownloadsGrowth": -13289, "DownloadsGrowthPct": -0.15, "DAU": 248820, "DAUGrowth": 52246, "DAUGrowthPct": 26.58, "MAU": 2281153, "MAUGrowth": 694986, "Status": "red"}, {"Rank": 149, "GameName": "Coloring & Learn", "Publisher": "Orange Studios Games", "Country": "Argentina", "Downloads": 5171756, "DownloadsGrowth": -722390, "DownloadsGrowthPct": -12.26, "DAU": 247145, "DAUGrowth": -36800, "DAUGrowthPct": -12.96, "MAU": 1733309, "MAUGrowth": -364741, "Status": "red"}, {"Rank": 150, "GameName": "Farm Land - Farming life game", "Publisher": "Homa", "Country": "France", "Downloads": 9380231, "DownloadsGrowth": -2602646, "DownloadsGrowthPct": -21.72, "DAU": 246208, "DAUGrowth": -76291, "DAUGrowthPct": -23.66, "MAU": 1844517, "MAUGrowth": -519904, "Status": "red"}, {"Rank": 151, "GameName": "A23", "Publisher": "Head Digital Works", "Country": "India", "Downloads": 8989030, "DownloadsGrowth": -13828718, "DownloadsGrowthPct": -60.61, "DAU": 245878, "DAUGrowth": 8779, "DAUGrowthPct": 3.7, "MAU": 1966413, "MAUGrowth": -198686, "Status": "red"}, {"Rank": 152, "GameName": "Prison Survival: Tap Challenge", "Publisher": "Higame Global", "Country": "Hong Kong", "Downloads": 23726728, "DownloadsGrowth": 20467402, "DownloadsGrowthPct": 627.96, "DAU": 245273, "DAUGrowth": 229594, "DAUGrowthPct": 1464.34, "MAU": 2936693, "MAUGrowth": 2665134, "Status": "red"}, {"Rank": 153, "GameName": "Little Panda: Doll Dress up", "Publisher": "BabyBus", "Country": "China", "Downloads": 0, "DownloadsGrowth": -4784782, "DownloadsGrowthPct": -100.0, "DAU": 244183, "DAUGrowth": -49898, "DAUGrowthPct": -16.97, "MAU": 1898894, "MAUGrowth": -461640, "Status": "red"}, {"Rank": 154, "GameName": "Ninja Arashi 2", "Publisher": "Black Panther", "Country": "Vietnam", "Downloads": 3881300, "DownloadsGrowth": 721578, "DownloadsGrowthPct": 22.84, "DAU": 242619, "DAUGrowth": 30185, "DAUGrowthPct": 14.21, "MAU": 1105227, "MAUGrowth": 153381, "Status": "red"}, {"Rank": 155, "GameName": "2248 - Numbers Game 2048", "Publisher": "Inspired Square", "Country": "United Arab Emirates", "Downloads": 3872504, "DownloadsGrowth": -1680833, "DownloadsGrowthPct": -30.27, "DAU": 240841, "DAUGrowth": 42275, "DAUGrowthPct": 21.29, "MAU": 1558111, "MAUGrowth": 301929, "Status": "red"}, {"Rank": 156, "GameName": "Color Adventure: Draw the Path", "Publisher": "Azur Interactive Games", "Country": "Cyprus", "Downloads": 7900005, "DownloadsGrowth": -4289742, "DownloadsGrowthPct": -35.19, "DAU": 240815, "DAUGrowth": -48576, "DAUGrowthPct": -16.79, "MAU": 2306337, "MAUGrowth": -387710, "Status": "red"}, {"Rank": 157, "GameName": "Bus Arrival", "Publisher": "Sixcube", "Country": "China", "Downloads": 10780605, "DownloadsGrowth": 2672971, "DownloadsGrowthPct": 32.97, "DAU": 240360, "DAUGrowth": 7947, "DAUGrowthPct": 3.42, "MAU": 2019388, "MAUGrowth": 318794, "Status": "red"}, {"Rank": 158, "GameName": "Carrom Lite-Board Offline Game", "Publisher": "Yocheer", "Country": "India", "Downloads": 6354147, "DownloadsGrowth": 2636045, "DownloadsGrowthPct": 70.9, "DAU": 240070, "DAUGrowth": 33124, "DAUGrowthPct": 16.01, "MAU": 1541971, "MAUGrowth": 232043, "Status": "yellow"}, {"Rank": 159, "GameName": "2 3 4 Player Mini Games", "Publisher": "Better World Games", "Country": "Netherlands", "Downloads": 4869628, "DownloadsGrowth": -226374, "DownloadsGrowthPct": -4.44, "DAU": 238989, "DAUGrowth": -15727, "DAUGrowthPct": -6.17, "MAU": 2031160, "MAUGrowth": 56802, "Status": "red"}, {"Rank": 160, "GameName": "Indian Lorry Truck Driving 3d", "Publisher": "Twins", "Country": "Pakistan", "Downloads": 1770563, "DownloadsGrowth": -1792648, "DownloadsGrowthPct": -50.31, "DAU": 236926, "DAUGrowth": 76367, "DAUGrowthPct": 47.56, "MAU": 1721410, "MAUGrowth": 506257, "Status": "yellow"}, {"Rank": 161, "GameName": "Howzat - Fantasy Cricket App", "Publisher": "Howzat Games", "Country": "India", "Downloads": 7315774, "DownloadsGrowth": -660634, "DownloadsGrowthPct": -8.28, "DAU": 234048, "DAUGrowth": -2967, "DAUGrowthPct": -1.25, "MAU": 1701373, "MAUGrowth": -19823, "Status": "red"}, {"Rank": 162, "GameName": "Hitwicket Cricket Game 2026", "Publisher": "Hitwicket Cricket Games", "Country": "India", "Downloads": 4257699, "DownloadsGrowth": -1622337, "DownloadsGrowthPct": -27.59, "DAU": 233923, "DAUGrowth": 28796, "DAUGrowthPct": 14.04, "MAU": 1153418, "MAUGrowth": 109019, "Status": "yellow"}, {"Rank": 163, "GameName": "Royal Kingdom", "Publisher": "Dream Games", "Country": "Turkey", "Downloads": 7498809, "DownloadsGrowth": 7409089, "DownloadsGrowthPct": 8258.01, "DAU": 232598, "DAUGrowth": 231892, "DAUGrowthPct": 32845.89, "MAU": 991193, "MAUGrowth": 983804, "Status": "red"}, {"Rank": 164, "GameName": "Bakery Stack: Cooking Games", "Publisher": "Fried Chicken Games", "Country": "Pakistan", "Downloads": 15031888, "DownloadsGrowth": 9610361, "DownloadsGrowthPct": 177.26, "DAU": 232170, "DAUGrowth": 181882, "DAUGrowthPct": 361.68, "MAU": 2188094, "MAUGrowth": 1689237, "Status": "yellow"}, {"Rank": 165, "GameName": "Indian Truck Games 2025- Lorry", "Publisher": "Creative Gamers Studio", "Country": "Pakistan", "Downloads": 363902, "DownloadsGrowth": -3109922, "DownloadsGrowthPct": -89.52, "DAU": 231073, "DAUGrowth": -38638, "DAUGrowthPct": -14.33, "MAU": 1607370, "MAUGrowth": -212894, "Status": "yellow"}, {"Rank": 166, "GameName": "BeBetta: Rewards for Champions", "Publisher": "ISocial Sports", "Country": "India", "Downloads": 3707006, "DownloadsGrowth": -3477507, "DownloadsGrowthPct": -48.4, "DAU": 229188, "DAUGrowth": -21755, "DAUGrowthPct": -8.67, "MAU": 2571578, "MAUGrowth": 359167, "Status": "red"}, {"Rank": 167, "GameName": "Bikes ibd plugin 3D", "Publisher": "PlayHobo", "Country": "India", "Downloads": 2142488, "DownloadsGrowth": 1730791, "DownloadsGrowthPct": 420.4, "DAU": 228347, "DAUGrowth": 216679, "DAUGrowthPct": 1857.04, "MAU": 1489800, "MAUGrowth": 1403690, "Status": "yellow"}, {"Rank": 168, "GameName": "World Of Carrom :3D Board Game", "Publisher": "AppOn", "Country": "India", "Downloads": 5929233, "DownloadsGrowth": -5259490, "DownloadsGrowthPct": -47.01, "DAU": 227085, "DAUGrowth": -162478, "DAUGrowthPct": -41.71, "MAU": 1387772, "MAUGrowth": -1077376, "Status": "yellow"}, {"Rank": 169, "GameName": "Block Puzzle Gem: Jewel Blast", "Publisher": "Lynn Mobile Puzzle Games", "Country": "Hong Kong", "Downloads": 1754564, "DownloadsGrowth": -2512125, "DownloadsGrowthPct": -58.88, "DAU": 225248, "DAUGrowth": -42924, "DAUGrowthPct": -16.01, "MAU": 858774, "MAUGrowth": -141382, "Status": "red"}, {"Rank": 170, "GameName": "Space shooter - Galaxy attack", "Publisher": "Onesoft", "Country": "Vietnam", "Downloads": 11158199, "DownloadsGrowth": -285785, "DownloadsGrowthPct": -2.5, "DAU": 224281, "DAUGrowth": 5260, "DAUGrowthPct": 2.4, "MAU": 2106159, "MAUGrowth": 155712, "Status": "red"}, {"Rank": 171, "GameName": "Moto Race Go", "Publisher": "XGame Studio", "Country": "China", "Downloads": 25722820, "DownloadsGrowth": 25059411, "DownloadsGrowthPct": 3777.37, "DAU": 223380, "DAUGrowth": 219814, "DAUGrowthPct": 6164.16, "MAU": 2765939, "MAUGrowth": 2721359, "Status": "red"}, {"Rank": 172, "GameName": "Bus Simulator - Bus Games 2022", "Publisher": "Simulator Games 2022", "Country": "Pakistan", "Downloads": 567163, "DownloadsGrowth": -1214331, "DownloadsGrowthPct": -68.16, "DAU": 220660, "DAUGrowth": 38665, "DAUGrowthPct": 21.25, "MAU": 1536004, "MAUGrowth": 280054, "Status": "yellow"}, {"Rank": 173, "GameName": "Car Out", "Publisher": "GameLord 3D", "Country": "China", "Downloads": 5720268, "DownloadsGrowth": 2583064, "DownloadsGrowthPct": 82.34, "DAU": 219316, "DAUGrowth": 55862, "DAUGrowthPct": 34.18, "MAU": 1257803, "MAUGrowth": 480139, "Status": "red"}, {"Rank": 174, "GameName": "Block Puzzle", "Publisher": "LinkDesks", "Country": "China", "Downloads": 4586873, "DownloadsGrowth": 45024, "DownloadsGrowthPct": 0.99, "DAU": 216345, "DAUGrowth": 47516, "DAUGrowthPct": 28.14, "MAU": 975440, "MAUGrowth": 217226, "Status": "red"}, {"Rank": 175, "GameName": "Sniper 3D: Gun Shooting Games", "Publisher": "Wildlife Studios", "Country": "Brazil", "Downloads": 13915921, "DownloadsGrowth": 1187641, "DownloadsGrowthPct": 9.33, "DAU": 214880, "DAUGrowth": 22226, "DAUGrowthPct": 11.54, "MAU": 2429736, "MAUGrowth": 340309, "Status": "red"}, {"Rank": 176, "GameName": "City Train Driving Simulator", "Publisher": "Supersoft Studio", "Country": "Pakistan", "Downloads": 107800, "DownloadsGrowth": -3625971, "DownloadsGrowthPct": -97.11, "DAU": 214486, "DAUGrowth": -202000, "DAUGrowthPct": -48.5, "MAU": 977015, "MAUGrowth": -671920, "Status": "yellow"}, {"Rank": 177, "GameName": "Chess Online - Play Chess", "Publisher": "Hagstrom Dev", "Country": "Sweden", "Downloads": 2313292, "DownloadsGrowth": 20607, "DownloadsGrowthPct": 0.9, "DAU": 211915, "DAUGrowth": 78446, "DAUGrowthPct": 58.77, "MAU": 944701, "MAUGrowth": 244169, "Status": "red"}, {"Rank": 178, "GameName": "Real Cricket GO", "Publisher": "Nautilus Mobile", "Country": "India", "Downloads": 5101882, "DownloadsGrowth": -2216651, "DownloadsGrowthPct": -30.29, "DAU": 210469, "DAUGrowth": -157852, "DAUGrowthPct": -42.86, "MAU": 1304759, "MAUGrowth": -723631, "Status": "yellow"}, {"Rank": 179, "GameName": "Real Bus Simulator : Bus Games", "Publisher": "Solo Studio", "Country": "United Kingdom", "Downloads": 20562463, "DownloadsGrowth": 4421553, "DownloadsGrowthPct": 27.39, "DAU": 209663, "DAUGrowth": 64718, "DAUGrowthPct": 44.65, "MAU": 2740228, "MAUGrowth": 943931, "Status": "red"}, {"Rank": 180, "GameName": "Shadow Fight 4: Arena", "Publisher": "Nekki", "Country": "Cyprus", "Downloads": 4356725, "DownloadsGrowth": -1413941, "DownloadsGrowthPct": -24.5, "DAU": 207942, "DAUGrowth": -51763, "DAUGrowthPct": -19.93, "MAU": 1118964, "MAUGrowth": -242606, "Status": "red"}, {"Rank": 181, "GameName": "Tic Tac Toe - 2 Player XO", "Publisher": "CDT Puzzle Studio", "Country": "Vietnam", "Downloads": 7129850, "DownloadsGrowth": -4418026, "DownloadsGrowthPct": -38.26, "DAU": 207274, "DAUGrowth": -129363, "DAUGrowthPct": -38.43, "MAU": 1840824, "MAUGrowth": -1023168, "Status": "red"}, {"Rank": 182, "GameName": "aquapark.io", "Publisher": "Voodoo", "Country": "France", "Downloads": 8107779, "DownloadsGrowth": 3292863, "DownloadsGrowthPct": 68.39, "DAU": 207078, "DAUGrowth": 65977, "DAUGrowthPct": 46.76, "MAU": 2042804, "MAUGrowth": 724827, "Status": "red"}, {"Rank": 183, "GameName": "My Supermarket Journey", "Publisher": "XGame Global", "Country": "Vietnam", "Downloads": 15582399, "DownloadsGrowth": 12471180, "DownloadsGrowthPct": 400.85, "DAU": 203867, "DAUGrowth": 176518, "DAUGrowthPct": 645.43, "MAU": 2158017, "MAUGrowth": 1829050, "Status": "red"}, {"Rank": 184, "GameName": "SortPuz: Water Sort Puzzle", "Publisher": "Dark Halo", "Country": "China", "Downloads": 3096045, "DownloadsGrowth": 454154, "DownloadsGrowthPct": 17.19, "DAU": 203619, "DAUGrowth": -22840, "DAUGrowthPct": -10.09, "MAU": 1261060, "MAUGrowth": 138979, "Status": "red"}, {"Rank": 185, "GameName": "Fashion Doll: Makeup Wala Game", "Publisher": "Dress Up Games", "Country": "Vietnam", "Downloads": 9656826, "DownloadsGrowth": 417318, "DownloadsGrowthPct": 4.52, "DAU": 203540, "DAUGrowth": -23980, "DAUGrowthPct": -10.54, "MAU": 1804150, "MAUGrowth": 143860, "Status": "red"}, {"Rank": 186, "GameName": "Sand Balls - Puzzle Game", "Publisher": "SayGames", "Country": "Cyprus", "Downloads": 5380794, "DownloadsGrowth": -727233, "DownloadsGrowthPct": -11.91, "DAU": 202351, "DAUGrowth": -45716, "DAUGrowthPct": -18.43, "MAU": 1494375, "MAUGrowth": -239169, "Status": "red"}, {"Rank": 187, "GameName": "Chess Online & Offline", "Publisher": "Splend Apps", "Country": "Poland", "Downloads": 4367185, "DownloadsGrowth": 3215060, "DownloadsGrowthPct": 279.05, "DAU": 202324, "DAUGrowth": 182430, "DAUGrowthPct": 917.01, "MAU": 1044582, "MAUGrowth": 908142, "Status": "red"}, {"Rank": 188, "GameName": "Tiledom", "Publisher": "Funvent Studios", "Country": "United Arab Emirates", "Downloads": 5336734, "DownloadsGrowth": 1985795, "DownloadsGrowthPct": 59.26, "DAU": 201896, "DAUGrowth": -92432, "DAUGrowthPct": -31.4, "MAU": 916600, "MAUGrowth": -74715, "Status": "red"}, {"Rank": 189, "GameName": "BMX Cycle Extreme Bicycle Game", "Publisher": "PlayFlix", "Country": "Pakistan", "Downloads": 14532087, "DownloadsGrowth": 2864220, "DownloadsGrowthPct": 24.55, "DAU": 200618, "DAUGrowth": 72864, "DAUGrowthPct": 57.03, "MAU": 2242990, "MAUGrowth": 688117, "Status": "yellow"}, {"Rank": 190, "GameName": "Happy Color: Coloring Book", "Publisher": "X-Flow", "Country": "Cyprus", "Downloads": 4641013, "DownloadsGrowth": 1452285, "DownloadsGrowthPct": 45.54, "DAU": 200093, "DAUGrowth": -12228, "DAUGrowthPct": -5.76, "MAU": 1244713, "MAUGrowth": 56401, "Status": "red"}, {"Rank": 191, "GameName": "Brawl Stars", "Publisher": "Supercell", "Country": "Finland", "Downloads": 689591, "DownloadsGrowth": -353199, "DownloadsGrowthPct": -33.87, "DAU": 197822, "DAUGrowth": -59483, "DAUGrowthPct": -23.12, "MAU": 523475, "MAUGrowth": -156671, "Status": "red"}, {"Rank": 192, "GameName": "Ludo Master - Ludo Board Game", "Publisher": "Hippo Games", "Country": "China", "Downloads": 4721850, "DownloadsGrowth": -3373400, "DownloadsGrowthPct": -41.67, "DAU": 196005, "DAUGrowth": -166215, "DAUGrowthPct": -45.89, "MAU": 1350808, "MAUGrowth": -658821, "Status": "red"}, {"Rank": 193, "GameName": "Sudoku - Classic Sudoku Puzzle", "Publisher": "Oakever Games", "Country": "China", "Downloads": 1727690, "DownloadsGrowth": 98216, "DownloadsGrowthPct": 6.03, "DAU": 195605, "DAUGrowth": -8103, "DAUGrowthPct": -3.98, "MAU": 1052683, "MAUGrowth": 4102, "Status": "red"}, {"Rank": 194, "GameName": "456 Run Challenge: Clash 3D", "Publisher": "Amobear Technology Group", "Country": "Vietnam", "Downloads": 16186053, "DownloadsGrowth": 7428187, "DownloadsGrowthPct": 84.82, "DAU": 195057, "DAUGrowth": 107970, "DAUGrowthPct": 123.98, "MAU": 2486827, "MAUGrowth": 1369640, "Status": "red"}, {"Rank": 195, "GameName": "Tik Tap Challenge", "Publisher": "XGame Global", "Country": "Vietnam", "Downloads": 13646370, "DownloadsGrowth": 4892829, "DownloadsGrowthPct": 55.9, "DAU": 194884, "DAUGrowth": 105598, "DAUGrowthPct": 118.27, "MAU": 2380917, "MAUGrowth": 1292058, "Status": "red"}, {"Rank": 196, "GameName": "Bike Rider", "Publisher": "Supercharge Mobile", "Country": "Brazil", "Downloads": 736880, "DownloadsGrowth": -1849871, "DownloadsGrowthPct": -71.51, "DAU": 194715, "DAUGrowth": 15535, "DAUGrowthPct": 8.67, "MAU": 1712474, "MAUGrowth": 184768, "Status": "red"}, {"Rank": 197, "GameName": "Beach Buggy Racing", "Publisher": "Vector Unit", "Country": "US", "Downloads": 3711906, "DownloadsGrowth": 435158, "DownloadsGrowthPct": 13.28, "DAU": 194043, "DAUGrowth": -255, "DAUGrowthPct": -0.13, "MAU": 1158068, "MAUGrowth": 48067, "Status": "red"}, {"Rank": 198, "GameName": "Kamla - Horror Exorcism Escape", "Publisher": "MadMantra", "Country": "India", "Downloads": 17631486, "DownloadsGrowth": 17631486, "DownloadsGrowthPct": 0, "DAU": 193748, "DAUGrowth": 193748, "DAUGrowthPct": 0, "MAU": 2342584, "MAUGrowth": 2342584, "Status": "yellow"}, {"Rank": 199, "GameName": "Pokemon UNITE", "Publisher": "The Pokemon Company", "Country": "Japan", "Downloads": 3361056, "DownloadsGrowth": -748616, "DownloadsGrowthPct": -18.22, "DAU": 193066, "DAUGrowth": -63608, "DAUGrowthPct": -24.78, "MAU": 876990, "MAUGrowth": -218903, "Status": "red"}, {"Rank": 200, "GameName": "Nails Salon Games - Nail Art", "Publisher": "Yories", "Country": "US", "Downloads": 1759500, "DownloadsGrowth": -2594504, "DownloadsGrowthPct": -59.59, "DAU": 192336, "DAUGrowth": 59429, "DAUGrowthPct": 44.71, "MAU": 1494308, "MAUGrowth": 385373, "Status": "red"}];
+
+var countries = ["Argentina", "Brazil", "China", "Cyprus", "Czech Republic", "Denmark", "Finland", "France", "Germany", "Hong Kong", "India", "Indonesia", "Ireland", "Israel", "Italy", "Japan", "Nepal", "Netherlands", "Pakistan", "Poland", "Russia", "Singapore", "South Korea", "Spain", "Sweden", "Switzerland", "Turkey", "US", "Ukraine", "United Arab Emirates", "United Kingdom", "Vietnam"];
+
+var currentSort = {field:'DAU',direction:'desc'};
+var showTop200 = false;
+var showCountry = false;
+var showDLChange = false;
+var showDAUChange = false;
+var showMAUChange = false;
+var dlShowPct = true;
+var dauShowPct = true;
+var selectedCountry = '';
+var searchTerm = '';
+var gameData = {};
+
+try { var saved = localStorage.getItem('india-games-v6'); if(saved) gameData = JSON.parse(saved); } catch(e){}
+
+var countrySelect = document.getElementById('countryFilter');
+countries.forEach(function(c) {
+    var opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    countrySelect.appendChild(opt);
+});
+
+function saveData() { try { localStorage.setItem('india-games-v6', JSON.stringify(gameData)); } catch(e){} }
+function formatNum(n) { if(n>=1e6) return (n/1e6).toFixed(1)+'M'; if(n>=1e3) return Math.round(n/1e3)+'K'; return n.toString(); }
+function formatGrowth(n, isPct) {
+    if(isPct) return (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
+    if(Math.abs(n)>=1e6) return (n >= 0 ? '+' : '') + (n/1e6).toFixed(1)+'M';
+    if(Math.abs(n)>=1e3) return (n >= 0 ? '+' : '') + Math.round(n/1e3)+'K';
+    return (n >= 0 ? '+' : '') + n.toString();
+}
+function getGrowthClass(n) { return n >= 0 ? 'growth-positive' : 'growth-negative'; }
+function getStatus(r) { return gameData[r]?.status || null; }
+function getComment(r) { return gameData[r]?.comment || ''; }
+function updateStatus(r,s) { if(!gameData[r]) gameData[r]={}; gameData[r].status=s; saveData(); }
+function updateComment(r,c) { if(!gameData[r]) gameData[r]={}; gameData[r].comment=c; saveData(); }
+
+function getFilteredData() {
+    var limit = showTop200 ? 200 : 100;
+    var data = gamesData.slice(0, limit);
+    if(selectedCountry) { data = data.filter(function(g) { return g.Country === selectedCountry; }); }
+    if(searchTerm) {
+        var t = searchTerm.toLowerCase();
+        data = data.filter(function(g) { 
+            return g.GameName.toLowerCase().indexOf(t)>=0 || g.Publisher.toLowerCase().indexOf(t)>=0 || g.Country.toLowerCase().indexOf(t)>=0; 
+        });
+    }
+    data.sort(function(a,b) {
+        var aV = a[currentSort.field], bV = b[currentSort.field];
+        return currentSort.direction === 'desc' ? bV - aV : aV - bV;
+    });
+    return data;
+}
+
+function toggleDLMode(e) { e.stopPropagation(); dlShowPct = !dlShowPct; document.getElementById('dlToggle').textContent = dlShowPct ? '%' : 'Mn'; renderTable(); }
+function toggleDAUMode(e) { e.stopPropagation(); dauShowPct = !dauShowPct; document.getElementById('dauToggle').textContent = dauShowPct ? '%' : 'Mn'; renderTable(); }
+
+function renderTable() {
+    var tbody = document.getElementById('tableBody');
+    var data = getFilteredData();
+    var html = '';
+    for(var i = 0; i < data.length; i++) {
+        var g = data[i];
+        var savedStatus = getStatus(g.Rank);
+        var status = savedStatus || g.Status;
+        var comment = getComment(g.Rank).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        var statusClass = 'status-' + status;
+        
+        var dlGrowthVal = dlShowPct ? g.DownloadsGrowthPct : g.DownloadsGrowth;
+        var dauGrowthVal = dauShowPct ? g.DAUGrowthPct : g.DAUGrowth;
+        
+        html += '<tr>';
+        html += '<td class="td-rank">'+g.Rank+'</td>';
+        html += '<td class="td-center"><select class="status-select '+statusClass+'" onchange="updateStatus('+g.Rank+',this.value);this.className=\'status-select status-\'+this.value;"><option value="green"'+(status==='green'?' selected':'')+'>🟢</option><option value="yellow"'+(status==='yellow'?' selected':'')+'>🟡</option><option value="red"'+(status==='red'?' selected':'')+'>🔴</option></select></td>';
+        html += '<td class="td-game">'+g.GameName+'</td>';
+        html += '<td class="td-publisher">'+g.Publisher+'</td>';
+        html += '<td class="td-country col-country">'+g.Country+'</td>';
+        html += '<td class="td-number">'+formatNum(g.Downloads)+'</td>';
+        html += '<td class="td-number col-dl-change '+getGrowthClass(dlGrowthVal)+'">'+formatGrowth(dlGrowthVal, dlShowPct)+'</td>';
+        html += '<td class="td-number">'+formatNum(g.DAU)+'</td>';
+        html += '<td class="td-number col-dau-change '+getGrowthClass(dauGrowthVal)+'">'+formatGrowth(dauGrowthVal, dauShowPct)+'</td>';
+        html += '<td class="td-number">'+formatNum(g.MAU)+'</td>';
+        html += '<td class="td-number col-mau-change '+getGrowthClass(g.MAUGrowth)+'">'+formatGrowth(g.MAUGrowth, false)+'</td>';
+        html += '<td><textarea class="comment-box" placeholder="Add notes..." onchange="updateComment('+g.Rank+',this.value)" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'">'+comment+'</textarea></td>';
+        html += '</tr>';
+    }
+    tbody.innerHTML = html;
+    var countryText = selectedCountry ? ' · Country: ' + selectedCountry : '';
+    document.getElementById('footer').textContent = 'Showing ' + data.length + ' Games' + countryText + ' · Last Updated: January 2026';
+}
+
+function updateSortIcons() {
+    var ths = document.querySelectorAll('th[data-sort]');
+    for(var i = 0; i < ths.length; i++) {
+        var th = ths[i];
+        var field = th.getAttribute('data-sort');
+        var icon = th.querySelector('.sort-icon');
+        icon.textContent = field === currentSort.field ? (currentSort.direction === 'desc' ? '↓' : '↑') : '↕';
+    }
+}
+
+function updateTableClasses() {
+    var table = document.getElementById('gamesTable');
+    table.classList.toggle('show-country', showCountry);
+    table.classList.toggle('show-dl-change', showDLChange);
+    table.classList.toggle('show-dau-change', showDAUChange);
+    table.classList.toggle('show-mau-change', showMAUChange);
+}
+
+document.getElementById('toggle200').addEventListener('change', function() { showTop200 = this.checked; renderTable(); });
+document.getElementById('toggleCountry').addEventListener('change', function() { showCountry = this.checked; updateTableClasses(); });
+document.getElementById('toggleDLChange').addEventListener('change', function() { showDLChange = this.checked; updateTableClasses(); });
+document.getElementById('toggleDAUChange').addEventListener('change', function() { showDAUChange = this.checked; updateTableClasses(); });
+document.getElementById('toggleMAUChange').addEventListener('change', function() { showMAUChange = this.checked; updateTableClasses(); });
+document.getElementById('countryFilter').addEventListener('change', function() { selectedCountry = this.value; renderTable(); });
+document.getElementById('searchInput').addEventListener('input', function() { searchTerm = this.value; renderTable(); });
+
+var ths = document.querySelectorAll('th[data-sort]');
+for(var i = 0; i < ths.length; i++) {
+    ths[i].addEventListener('click', function() {
+        var field = this.getAttribute('data-sort');
+        if(currentSort.field === field) { currentSort.direction = currentSort.direction === 'desc' ? 'asc' : 'desc'; }
+        else { currentSort.field = field; currentSort.direction = 'desc'; }
+        updateSortIcons();
+        renderTable();
+    });
+}
+
+renderTable();
+</script>
+</body>
+</html>
