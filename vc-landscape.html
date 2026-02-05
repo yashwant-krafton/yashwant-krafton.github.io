@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India VC Dashboard | Investor Activity Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Serif&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0612;
+            --bg-secondary: #120b1a;
+            --bg-card: rgba(25, 15, 35, 0.85);
+            --pink-glow: #ff2d75;
+            --pink-soft: #ff6b9d;
+            --pink-muted: rgba(255, 45, 117, 0.15);
+            --purple-accent: #9d4edd;
+            --cyan-accent: #00d9ff;
+            --text-primary: #f0e6ff;
+            --text-secondary: #a89bb5;
+            --border-color: rgba(255, 107, 157, 0.2);
+            --gradient-pink: linear-gradient(135deg, #ff2d75 0%, #ff6b9d 50%, #9d4edd 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Stars Background */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--min-opacity); transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--pink-glow), transparent);
+            animation: shoot 3s ease-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes shoot {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(500px) translateY(300px); opacity: 0; }
+        }
+
+        /* Nebula Effect */
+        .nebula {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            z-index: 0;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .nebula-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--pink-glow) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+        }
+
+        .nebula-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--purple-accent) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        /* Main Container */
+        .dashboard-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3rem;
+            font-weight: 400;
+            background: var(--gradient-pink);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: var(--pink-muted);
+            border: 1px solid var(--pink-glow);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--pink-soft);
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            font-family: 'DM Sans', sans-serif;
+            padding: 15px 40px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-pink);
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .tab-btn:hover::before, .tab-btn.active::before {
+            left: 0;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            color: white;
+            border-color: var(--pink-glow);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 45, 117, 0.3);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-pink);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--pink-soft);
+            box-shadow: 0 20px 40px rgba(255, 45, 117, 0.2);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--pink-soft);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--pink-soft);
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 3px solid var(--pink-glow);
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 30px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--pink-glow);
+            box-shadow: 0 0 20px rgba(255, 45, 117, 0.2);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Table Container */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            background: linear-gradient(180deg, rgba(255, 45, 117, 0.2) 0%, rgba(157, 78, 221, 0.1) 100%);
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--pink-soft);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--pink-glow);
+        }
+
+        th:hover {
+            background: rgba(255, 45, 117, 0.3);
+        }
+
+        th .sort-icon {
+            margin-left: 8px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        th:hover .sort-icon, th.sorted .sort-icon {
+            opacity: 1;
+        }
+
+        td {
+            padding: 16px 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        tr {
+            transition: all 0.3s ease;
+        }
+
+        tr:hover {
+            background: rgba(255, 45, 117, 0.08);
+        }
+
+        tr:hover td {
+            color: white;
+        }
+
+        .fund-name {
+            font-weight: 600;
+            color: var(--cyan-accent);
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #a0522d); color: #fff; }
+        .rank-other { background: var(--pink-muted); color: var(--pink-soft); }
+
+        .metric-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bar-fill {
+            height: 8px;
+            background: var(--gradient-pink);
+            border-radius: 4px;
+            min-width: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* Top Funds Showcase */
+        .top-funds-showcase {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .showcase-card {
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: 25px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .showcase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-pink);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .showcase-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .showcase-card.gold {
+            border-color: #ffd700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .showcase-card.silver {
+            border-color: #c0c0c0;
+            box-shadow: 0 0 30px rgba(192, 192, 192, 0.2);
+        }
+
+        .showcase-card.bronze {
+            border-color: #cd7f32;
+            box-shadow: 0 0 30px rgba(205, 127, 50, 0.2);
+        }
+
+        .showcase-rank {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .showcase-name {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .showcase-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .showcase-stat {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 10px;
+            border-radius: 15px;
+        }
+
+        .showcase-stat-value {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--pink-soft);
+        }
+
+        .showcase-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        /* Infographic Section */
+        .infographic-section {
+            margin-bottom: 40px;
+        }
+
+        .infographic-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--pink-soft);
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 3px solid var(--pink-glow);
+        }
+
+        .infographic-bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .infographic-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .infographic-bar-label {
+            width: 200px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .infographic-bar-track {
+            flex: 1;
+            height: 30px;
+            background: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .infographic-bar-fill {
+            height: 100%;
+            background: var(--gradient-pink);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            transition: width 0.8s ease;
+        }
+
+        /* Sector Dropdown */
+        .sector-dropdown-container {
+            margin-bottom: 30px;
+        }
+
+        .sector-dropdown-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            display: block;
+        }
+
+        .sector-dropdown {
+            width: 100%;
+            max-width: 400px;
+            padding: 14px 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 15px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff6b9d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+        }
+
+        .sector-dropdown:focus {
+            outline: none;
+            border-color: var(--pink-glow);
+            box-shadow: 0 0 20px rgba(255, 45, 117, 0.2);
+        }
+
+        .sector-dropdown option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 10px;
+        }
+
+        /* Sector Detail Card */
+        .sector-detail-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .sector-detail-header {
+            background: linear-gradient(135deg, rgba(255, 45, 117, 0.2) 0%, rgba(157, 78, 221, 0.1) 100%);
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sector-detail-name {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .sector-detail-body {
+            padding: 25px;
+        }
+
+        .fund-rank-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .fund-rank-item:hover {
+            background: rgba(255, 45, 117, 0.1);
+            border-color: var(--border-color);
+        }
+
+        .fund-rank-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--pink-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--pink-soft);
+        }
+
+        .fund-rank-number.top-3 {
+            background: var(--gradient-pink);
+            color: white;
+        }
+
+        .fund-rank-name {
+            flex: 1;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .fund-rank-count {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            color: var(--cyan-accent);
+            font-weight: 600;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--pink-glow);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--pink-soft);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .top-funds-showcase {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tab-btn {
+                padding: 12px 25px;
+                font-size: 0.9rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Stars Background -->
+    <div class="stars-container" id="starsContainer"></div>
+    
+    <!-- Nebula Effects -->
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <h1>India VC Dashboard</h1>
+            <p>Mapping Venture Capital Activity Across the Ecosystem</p>
+            <div class="header-badge">Top 100 Funds Analysis · 41 Sectors Tracked</div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="funds">Most Active Funds</button>
+            <button class="tab-btn" data-tab="sectors">Sectoral Split</button>
+        </nav>
+
+        <!-- Tab 1: Most Active Funds -->
+        <div class="tab-content active" id="funds-tab">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Active VC Funds</div>
+                    <div class="stat-value" id="totalFunds">100</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Portfolio Companies</div>
+                    <div class="stat-value" id="totalPortfolio">3,025</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Funding Rounds</div>
+                    <div class="stat-value" id="totalRounds">3,762</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Seed Investments</div>
+                    <div class="stat-value" id="totalSeed">1,892</div>
+                </div>
+            </div>
+
+            <!-- Top 3 Showcase -->
+            <div class="top-funds-showcase">
+                <div class="showcase-card gold" id="showcase-1"></div>
+                <div class="showcase-card silver" id="showcase-2"></div>
+                <div class="showcase-card bronze" id="showcase-3"></div>
+            </div>
+
+            <!-- Infographic Section -->
+            <div class="infographic-section">
+                <h3 class="infographic-title">Top 10 by Portfolio Size</h3>
+                <div class="infographic-bar-container" id="portfolioInfographic"></div>
+            </div>
+
+            <div class="infographic-section">
+                <h3 class="infographic-title">Top 10 by Total Funding Rounds</h3>
+                <div class="infographic-bar-container" id="roundsInfographic"></div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3 class="chart-title">Top 15 Funds - Comparative Analysis</h3>
+                    <canvas id="comparativeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-controls">
+                <div class="search-box">
+                    <input type="text" id="fundSearch" placeholder="Search funds...">
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <table id="fundsTable">
+                        <thead>
+                            <tr>
+                                <th data-sort="rank">Rank <span class="sort-icon">▼</span></th>
+                                <th data-sort="name">Fund Name <span class="sort-icon">▼</span></th>
+                                <th data-sort="portfolio">Portfolio <span class="sort-icon">▼</span></th>
+                                <th data-sort="rounds">Total Rounds <span class="sort-icon">▼</span></th>
+                                <th data-sort="seed">Seed <span class="sort-icon">▼</span></th>
+                                <th data-sort="seriesA">Series A <span class="sort-icon">▼</span></th>
+                                <th data-sort="seriesB">Series B <span class="sort-icon">▼</span></th>
+                                <th data-sort="seriesC">Series C <span class="sort-icon">▼</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="fundsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Sectoral Split -->
+        <div class="tab-content" id="sectors-tab">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Sectors Tracked</div>
+                    <div class="stat-value">41</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Most Sector Dominance</div>
+                    <div class="stat-value" id="topSectorFund">Venture Catalysts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Most Active Sector</div>
+                    <div class="stat-value" id="hottestSector">Consumer</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Sector Leadership Count</div>
+                    <div class="stat-value" id="sectorLeaderCount">15</div>
+                </div>
+            </div>
+
+            <!-- Sector Charts -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3 class="chart-title">Fund Sector Dominance (Top 10)</h3>
+                    <canvas id="sectorDominanceChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Top Sectors by Investment Activity</h3>
+                    <canvas id="topSectorsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sector Dropdown -->
+            <div class="sector-dropdown-container">
+                <label class="sector-dropdown-label">Select Sector to View Top 10 Funds</label>
+                <select class="sector-dropdown" id="sectorDropdown">
+                    <option value="">-- Select a Sector --</option>
+                </select>
+            </div>
+
+            <!-- Sector Detail Card -->
+            <div class="sector-detail-card" id="sectorDetailCard" style="display: none;">
+                <div class="sector-detail-header">
+                    <div class="sector-detail-name" id="selectedSectorName"></div>
+                </div>
+                <div class="sector-detail-body" id="sectorFundsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const fundsData = [{"Rank": 1, "Fund Name": "Inflection Point Ventures", "Portfolio Count (India)": 145, "Total Rounds (India)": 175, "Seed": 112, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Fire AI (Follow-on Round, Jan 2026); Fabpad (First Round, Jan 2026); Conscious Chemist (Follow-on Round, Dec 2025); Tida Sports (First Round, Dec 2025); BatteryPool (Follow-on Round, Nov 2025)"}, {"Rank": 2, "Fund Name": "Blume Venture", "Portfolio Count (India)": 104, "Total Rounds (India)": 139, "Seed": 57, "Series A": 13, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Mysa (Follow-on Round, Jan 2026); Bolna (First Round, Jan 2026); Aerem (Follow-on Round, Jan 2026); PowerUp Money (Follow-on Round, Dec 2025); Virohan (Follow-on Round, Dec 2025)"}, {"Rank": 3, "Fund Name": "Venture Catalysts", "Portfolio Count (India)": 119, "Total Rounds (India)": 135, "Seed": 84, "Series A": 12, "Series B": 2, "Series C": 0, "Top 5 Recent Bets (India)": "MEINE Electric (First Round, Jan 2026); Fire AI (Follow-on Round, Jan 2026); MiniPIX (First Round, Jan 2026); Rotoris (First Round, Dec 2025); Beyond Renewables (First Round, Oct 2025)"}, {"Rank": 4, "Fund Name": "Accel", "Portfolio Count (India)": 87, "Total Rounds (India)": 117, "Seed": 25, "Series A": 13, "Series B": 6, "Series C": 1, "Top 5 Recent Bets (India)": "Optimist (First Round, Jan 2026); Knight FinTech (Follow-on Round, Jan 2026); PowerUp Money (Follow-on Round, Dec 2025); EtherealX (First Round, Dec 2025); Spinny (Follow-on Round, Dec 2025)"}, {"Rank": 5, "Fund Name": "Peak XV Partners", "Portfolio Count (India)": 87, "Total Rounds (India)": 112, "Seed": 26, "Series A": 17, "Series B": 5, "Series C": 2, "Top 5 Recent Bets (India)": "PowerUp Money (First Round, Dec 2025); EDT World (First Round, Dec 2025); Digantara (Follow-on Round, Dec 2025); Ambak (Follow-on Round, Nov 2025); Cybrilla (First Round, Oct 2025)"}, {"Rank": 6, "Fund Name": "We Founder Circle", "Portfolio Count (India)": 79, "Total Rounds (India)": 106, "Seed": 45, "Series A": 8, "Series B": 3, "Series C": 0, "Top 5 Recent Bets (India)": "ProjectStudio (First Round, Jan 2026); DesignX (First Round, Jul 2025); Garuda Aerospace (Follow-on Round, Jun 2025); Growit (Follow-on Round, May 2025); BlackCarrot (Follow-on Round, May 2025)"}, {"Rank": 7, "Fund Name": "Z47", "Portfolio Count (India)": 68, "Total Rounds (India)": 95, "Seed": 38, "Series A": 5, "Series B": 2, "Series C": 0, "Top 5 Recent Bets (India)": "Emversity (Follow-on Round, Jan 2026); Ambak (Follow-on Round, Nov 2025); Dezerv (Follow-on Round, Oct 2025); GreyLabs (Follow-on Round, Oct 2025); Oolka (Follow-on Round, Sep 2025)"}, {"Rank": 8, "Fund Name": "Rainmatter", "Portfolio Count (India)": 80, "Total Rounds (India)": 94, "Seed": 47, "Series A": 11, "Series B": 5, "Series C": 1, "Top 5 Recent Bets (India)": "Zerocircle (Follow-on Round, Jan 2026); StepOut (Follow-on Round, Jan 2026); PolyCycl (First Round, Jan 2026); AssetPlus (Follow-on Round, Jan 2026); Wint Wealth (Follow-on Round, Jan 2026)"}, {"Rank": 9, "Fund Name": "100X.VC", "Portfolio Count (India)": 90, "Total Rounds (India)": 94, "Seed": 78, "Series A": 0, "Series B": 0, "Series C": 1, "Top 5 Recent Bets (India)": "AgniKul (First Round, Nov 2025); Neural Defend (First Round, Mar 2025); PlaySuper (Follow-on Round, Feb 2025); Numberlabs (First Round, Jan 2025); TRADO (First Round, Jan 2025)"}, {"Rank": 10, "Fund Name": "Firstport Capital", "Portfolio Count (India)": 67, "Total Rounds (India)": 75, "Seed": 55, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Conscious Chemist (Follow-on Round, Dec 2025); Toffee Coffee Roasters (First Round, Sep 2025); OneDios (First Round, Aug 2025); Samaaro (First Round, Jul 2025); FitFeast (First Round, Jun 2025)"}, {"Rank": 11, "Fund Name": "Info Edge Ventures", "Portfolio Count (India)": 54, "Total Rounds (India)": 68, "Seed": 24, "Series A": 7, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "TractorJunction (Follow-on Round, Nov 2025); TractorJunction (Follow-on Round, Nov 2025); Attentive (Follow-on Round, Nov 2025); shoppin (Follow-on Round, Nov 2025); Mirana Toys (Follow-on Round, Oct 2025)"}, {"Rank": 12, "Fund Name": "Fireside Ventures", "Portfolio Count (India)": 45, "Total Rounds (India)": 67, "Seed": 21, "Series A": 10, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Escape Plan (Follow-on Round, Jan 2026); Troovy (Follow-on Round, Jan 2026); Antinorm (First Round, Jan 2026); Cumin (Follow-on Round, Jan 2026); Inito (Follow-on Round, Dec 2025)"}, {"Rank": 13, "Fund Name": "Elevation Capital", "Portfolio Count (India)": 48, "Total Rounds (India)": 59, "Seed": 8, "Series A": 12, "Series B": 4, "Series C": 1, "Top 5 Recent Bets (India)": "Skydo (Follow-on Round, Dec 2025); Snabbit (Follow-on Round, Oct 2025); SpeakX (Follow-on Round, Oct 2025); Dezerv (Follow-on Round, Oct 2025); GreyLabs (First Round, Oct 2025)"}, {"Rank": 14, "Fund Name": "3one4 Capital", "Portfolio Count (India)": 42, "Total Rounds (India)": 59, "Seed": 16, "Series A": 4, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Zerocircle (First Round, Jan 2026); Wint Wealth (Follow-on Round, Jan 2026); Unbox Robotics (Follow-on Round, Jan 2026); Knight FinTech (Follow-on Round, Jan 2026); PadCare Labs (First Round, Dec 2025)"}, {"Rank": 15, "Fund Name": "Soonicorn Ventures", "Portfolio Count (India)": 49, "Total Rounds (India)": 58, "Seed": 40, "Series A": 8, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Adiabatic (First Round, Dec 2025); ScrapUncle (First Round, Jul 2025); DaveAI (Follow-on Round, Apr 2025); DaveAI (First Round, Apr 2025); Yoska (First Round, Mar 2025)"}, {"Rank": 16, "Fund Name": "Nexus Venture Partners", "Portfolio Count (India)": 37, "Total Rounds (India)": 57, "Seed": 13, "Series A": 7, "Series B": 2, "Series C": 1, "Top 5 Recent Bets (India)": "AssetPlus (First Round, Jan 2026); Liquidnitro Games (Follow-on Round, Jan 2026); Elecbits (First Round, Dec 2025); Snabbit (Follow-on Round, Oct 2025); faff (First Round, Oct 2025)"}, {"Rank": 17, "Fund Name": "Titan Capital", "Portfolio Count (India)": 45, "Total Rounds (India)": 54, "Seed": 33, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "For Real (First Round, Jan 2026); Be Clinical (Follow-on Round, Jan 2026); CuePilot (First Round, Dec 2025); IPF (First Round, Dec 2025); FAE Beauty (Follow-on Round, Nov 2025)"}, {"Rank": 18, "Fund Name": "Chiratae Ventures", "Portfolio Count (India)": 41, "Total Rounds (India)": 53, "Seed": 5, "Series A": 3, "Series B": 2, "Series C": 0, "Top 5 Recent Bets (India)": "TakeMe2Space (First Round, Dec 2025); CtrlB (First Round, Nov 2025); Dr Paws (First Round, Oct 2025); Gullak (First Round, Sep 2025); HouseEazy (Follow-on Round, Sep 2025)"}, {"Rank": 19, "Fund Name": "Lightspeed Venture Partners", "Portfolio Count (India)": 35, "Total Rounds (India)": 52, "Seed": 11, "Series A": 6, "Series B": 6, "Series C": 0, "Top 5 Recent Bets (India)": "Whizzo (Follow-on Round, Jan 2026); Emversity (Follow-on Round, Jan 2026); Snabbit (Follow-on Round, Oct 2025); Zepto (Follow-on Round, Oct 2025); Airbound (Follow-on Round, Oct 2025)"}, {"Rank": 20, "Fund Name": "SiriusOne", "Portfolio Count (India)": 45, "Total Rounds (India)": 51, "Seed": 27, "Series A": 5, "Series B": 3, "Series C": 0, "Top 5 Recent Bets (India)": "SpaceFields (Follow-on Round, Sep 2025); Lucira Jewelry (First Round, Sep 2025); Unibose (First Round, Jul 2025); SpaceFields (Follow-on Round, Jul 2025); ReplyAll (First Round, Jun 2025)"}, {"Rank": 21, "Fund Name": "DeVC", "Portfolio Count (India)": 43, "Total Rounds (India)": 51, "Seed": 41, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "PowerUp Money (Follow-on Round, Dec 2025); Riverline (First Round, Nov 2025); Ambak (Follow-on Round, Nov 2025); AeroDome Technologies (First Round, Oct 2025); Lucio (First Round, Oct 2025)"}, {"Rank": 22, "Fund Name": "Gruhas", "Portfolio Count (India)": 41, "Total Rounds (India)": 50, "Seed": 26, "Series A": 11, "Series B": 1, "Series C": 1, "Top 5 Recent Bets (India)": "Anthriq (Follow-on Round, Apr 2025); LehLah (First Round, Apr 2025); IPEC (First Round, Mar 2025); Pizza Wings (Follow-on Round, Mar 2025); Broadway (First Round, Mar 2025)"}, {"Rank": 23, "Fund Name": "All In Capital", "Portfolio Count (India)": 37, "Total Rounds (India)": 49, "Seed": 33, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Super Living (Follow-on Round, Jan 2026); Salty (Follow-on Round, Jan 2026); &Done (Follow-on Round, Jan 2026); &Done (First Round, Nov 2025); Super Living (First Round, Sep 2025)"}, {"Rank": 24, "Fund Name": "IIMA Ventures", "Portfolio Count (India)": 42, "Total Rounds (India)": 47, "Seed": 35, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Mysa (Follow-on Round, Jan 2026); Raana semiconductors (First Round, Jan 2026); Blinq Mobility (First Round, Dec 2025); Quintrans (First Round, Dec 2025); Beyond Renewables (First Round, Oct 2025)"}, {"Rank": 25, "Fund Name": "India Quotient", "Portfolio Count (India)": 34, "Total Rounds (India)": 45, "Seed": 25, "Series A": 3, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Novelty Wealth (First Round, Nov 2025); Lorazzo (First Round, Nov 2025); Openhouse (First Round, Oct 2025); Navo (First Round, Sep 2025); Home Essentials (Follow-on Round, Sep 2025)"}, {"Rank": 26, "Fund Name": "IvyCap Ventures Advisors", "Portfolio Count (India)": 32, "Total Rounds (India)": 42, "Seed": 11, "Series A": 10, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Raana semiconductors (First Round, Jan 2026); Spector (First Round, Jan 2026); Meal of the Moment (First Round, Dec 2025); Agraga (Follow-on Round, Nov 2025); Dhruva Space (Follow-on Round, Nov 2025)"}, {"Rank": 27, "Fund Name": "Kalaari Capital", "Portfolio Count (India)": 31, "Total Rounds (India)": 42, "Seed": 13, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Digantara (Follow-on Round, Dec 2025); SuperBryn (First Round, Dec 2025); HerKey (Follow-on Round, Nov 2025); Pype (First Round, Nov 2025); MeshDefend (First Round, Nov 2025)"}, {"Rank": 28, "Fund Name": "QED Innovation Labs", "Portfolio Count (India)": 40, "Total Rounds (India)": 40, "Seed": 33, "Series A": 3, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Ignosis (First Round, Sep 2025); CRED (Follow-on Round, May 2025); Reel Saga (First Round, Mar 2025); Swish (First Round, Mar 2025); Meolaa (First Round, Jan 2025)"}, {"Rank": 29, "Fund Name": "DSG Consumer Partners", "Portfolio Count (India)": 30, "Total Rounds (India)": 39, "Seed": 8, "Series A": 5, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "WanderOn (First Round, Jan 2026); Secret Alchemist (First Round, Dec 2025); Hunger (First Round, Oct 2025); StayVista (Follow-on Round, Jun 2025); Rabitat (First Round, Jun 2025)"}, {"Rank": 30, "Fund Name": "Sauce", "Portfolio Count (India)": 22, "Total Rounds (India)": 38, "Seed": 12, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Loopie (First Round, Dec 2025); Loopie (Follow-on Round, Dec 2025); EDT World (First Round, Dec 2025); Jollee (Follow-on Round, Dec 2025); Supertails (Follow-on Round, Nov 2025)"}, {"Rank": 31, "Fund Name": "Whiteboard Capital", "Portfolio Count (India)": 29, "Total Rounds (India)": 37, "Seed": 13, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Nivasa Finance (First Round, Sep 2025); Tuco Kids (First Round, Sep 2025); Apnaklub (Follow-on Round, Jun 2025); DaMENSCH (Follow-on Round, Jan 2025); Elevn (Follow-on Round, Jan 2025)"}, {"Rank": 32, "Fund Name": "Prime Venture Partners", "Portfolio Count (India)": 25, "Total Rounds (India)": 37, "Seed": 10, "Series A": 3, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Knight FinTech (Follow-on Round, Jan 2026); Nivasa Finance (Follow-on Round, Sep 2025); Klaar (First Round, Sep 2025); TechXR (First Round, Jul 2025); Nivasa Finance (First Round, Jul 2025)"}, {"Rank": 33, "Fund Name": "Omnivore", "Portfolio Count (India)": 27, "Total Rounds (India)": 36, "Seed": 6, "Series A": 4, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "TractorJunction (Follow-on Round, Nov 2025); TractorJunction (Follow-on Round, Nov 2025); Optimo Capital (Follow-on Round, Oct 2025); Celcius (First Round, Apr 2025); Cargofirst (First Round, Apr 2025)"}, {"Rank": 34, "Fund Name": "Lead Angels", "Portfolio Count (India)": 29, "Total Rounds (India)": 36, "Seed": 19, "Series A": 4, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Money Club (Follow-on Round, Mar 2025); Explurger (Follow-on Round, Feb 2025); EventBeep (Follow-on Round, Nov 2024); QuickShift (First Round, Oct 2024); Money Club (First Round, Sep 2024)"}, {"Rank": 35, "Fund Name": "Stellaris Venture Partners", "Portfolio Count (India)": 29, "Total Rounds (India)": 36, "Seed": 17, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Dazzl (First Round, Jan 2026); Arrowhead (First Round, Jan 2026); Truva (Follow-on Round, Dec 2025); GoodScore (First Round, Oct 2025); Rupicard (Follow-on Round, Oct 2025)"}, {"Rank": 36, "Fund Name": "Unicorn India Ventures", "Portfolio Count (India)": 27, "Total Rounds (India)": 34, "Seed": 17, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "TakeMe2Space (First Round, Dec 2025); Aurassure (Follow-on Round, Dec 2025); Medyseva (First Round, Nov 2025); StampMyVisa (Follow-on Round, Oct 2025); Zealthix (First Round, Sep 2025)"}, {"Rank": 37, "Fund Name": "Better Capital", "Portfolio Count (India)": 30, "Total Rounds (India)": 33, "Seed": 21, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "IPF (First Round, Dec 2025); Matters (Follow-on Round, Oct 2025); Arise (First Round, Aug 2025); BiofuelCircle (Follow-on Round, Aug 2025); Anmasa (First Round, Jun 2025)"}, {"Rank": 38, "Fund Name": "Capital-A", "Portfolio Count (India)": 26, "Total Rounds (India)": 33, "Seed": 16, "Series A": 3, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Chargeup (Follow-on Round, Jan 2026); Misochain (First Round, Jan 2026); Quintrans (First Round, Dec 2025); Enerzi (First Round, Nov 2025); Manastu Space (First Round, Aug 2025)"}, {"Rank": 39, "Fund Name": "SucSEED Indovation", "Portfolio Count (India)": 28, "Total Rounds (India)": 32, "Seed": 16, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "StepOut (First Round, Jan 2026); Fire AI (First Round, Jan 2026); We360.ai (Follow-on Round, Sep 2025); Samaaro (Follow-on Round, Jul 2025); Beat22 (First Round, May 2025)"}, {"Rank": 40, "Fund Name": "Kae Capital", "Portfolio Count (India)": 24, "Total Rounds (India)": 32, "Seed": 10, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Enerzolve (First Round, Jan 2026); Super Living (First Round, Jan 2026); PowerUp Money (Follow-on Round, Dec 2025); KNOT (Follow-on Round, Dec 2025); RecommerceX (Follow-on Round, Nov 2025)"}, {"Rank": 41, "Fund Name": "Pontaq", "Portfolio Count (India)": 30, "Total Rounds (India)": 31, "Seed": 28, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Edgehax (First Round, Nov 2025); Dweepi (First Round, Nov 2025); Coratia (Follow-on Round, Nov 2025); Aquapulse (First Round, Oct 2025); AiEnsured (First Round, Oct 2025)"}, {"Rank": 42, "Fund Name": "PointOne Capital", "Portfolio Count (India)": 27, "Total Rounds (India)": 31, "Seed": 26, "Series A": 0, "Series B": 0, "Series C": 1, "Top 5 Recent Bets (India)": "Raana semiconductors (First Round, Jan 2026); Lemnisca (First Round, Nov 2025); CtrlB (First Round, Nov 2025); SecureMachines (First Round, Aug 2025); Paraayan (First Round, Apr 2025)"}, {"Rank": 43, "Fund Name": "Campus Fund", "Portfolio Count (India)": 23, "Total Rounds (India)": 30, "Seed": 21, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Gati Drives (First Round, Jan 2026); CtrlB (Follow-on Round, Nov 2025); We360.ai (Follow-on Round, Sep 2025); Dcluttr (First Round, Sep 2025); Serendipity Space (First Round, Jul 2025)"}, {"Rank": 44, "Fund Name": "General Catalyst", "Portfolio Count (India)": 23, "Total Rounds (India)": 30, "Seed": 12, "Series A": 1, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Bolna (First Round, Jan 2026); Zepto (Follow-on Round, Oct 2025); Meolaa (First Round, Oct 2025); CityMall (Follow-on Round, Sep 2025); Pronto (First Round, Aug 2025)"}, {"Rank": 45, "Fund Name": "WEH Ventures", "Portfolio Count (India)": 16, "Total Rounds (India)": 29, "Seed": 10, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Flent (Follow-on Round, Jan 2026); Flent (Follow-on Round, Jan 2026); Praan (First Round, Nov 2025); Thefragaria (First Round, Oct 2025); Flent (Follow-on Round, Aug 2025)"}, {"Rank": 46, "Fund Name": "Gujarat Venture Finance", "Portfolio Count (India)": 26, "Total Rounds (India)": 29, "Seed": 16, "Series A": 7, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "insideFPV (First Round, Jan 2026); Soleos Solar Energy (Follow-on Round, Dec 2025); HRS Navigation (First Round, Nov 2025); Doco (First Round, Nov 2025); PROTOUCH (First Round, Nov 2025)"}, {"Rank": 47, "Fund Name": "Axilor Ventures", "Portfolio Count (India)": 22, "Total Rounds (India)": 29, "Seed": 7, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "QuickShift (Follow-on Round, Oct 2025); FluxGen (Follow-on Round, Feb 2025); Metalbook (Follow-on Round, Feb 2025); Capgrid (Follow-on Round, Feb 2025); Capgrid (Follow-on Round, Jan 2025)"}, {"Rank": 48, "Fund Name": "Speciale Invest", "Portfolio Count (India)": 25, "Total Rounds (India)": 28, "Seed": 17, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "AeroDome Technologies (First Round, Oct 2025); DashamLabs (First Round, Oct 2025); UNMANND (First Round, Sep 2025); VyomIC (First Round, Sep 2025); Morphing Machines (Follow-on Round, Sep 2025)"}, {"Rank": 49, "Fund Name": "Shastra", "Portfolio Count (India)": 21, "Total Rounds (India)": 28, "Seed": 18, "Series A": 3, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Sisir Radar (Follow-on Round, Dec 2025); Axirium Aerospace (First Round, Nov 2025); Wankel Energy Systems (First Round, Sep 2025); Klaar (Follow-on Round, Sep 2025); Drizz (First Round, Jul 2025)"}, {"Rank": 50, "Fund Name": "Avaana Capital Advisors", "Portfolio Count (India)": 20, "Total Rounds (India)": 27, "Seed": 12, "Series A": 4, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Aerem (Follow-on Round, Jan 2026); TSUYO (First Round, Oct 2025); Equilibrium (First Round, Sep 2025); BacAlt BioSciences (First Round, Sep 2025); Wastelink (First Round, Aug 2025)"}, {"Rank": 51, "Fund Name": "Bessemer Venture Partners", "Portfolio Count (India)": 21, "Total Rounds (India)": 27, "Seed": 4, "Series A": 5, "Series B": 6, "Series C": 1, "Top 5 Recent Bets (India)": "Sukino (First Round, Jan 2026); Aivar Innovations (First Round, Jan 2026); Moxie Beauty (First Round, Nov 2025); Pluro Fertility and IVF (First Round, Oct 2025); Seekho (First Round, Aug 2025)"}, {"Rank": 52, "Fund Name": "Omidyar Network India", "Portfolio Count (India)": 20, "Total Rounds (India)": 26, "Seed": 2, "Series A": 4, "Series B": 1, "Series C": 1, "Top 5 Recent Bets (India)": "HexaHealth (Follow-on Round, Dec 2024); Dropshop Network (Follow-on Round, May 2024); GramCover (Follow-on Round, May 2024); Buyume (Follow-on Round, Mar 2024); IntrCity SmartBus (First Round, Feb 2024)"}, {"Rank": 53, "Fund Name": "Vertex Ventures", "Portfolio Count (India)": 16, "Total Rounds (India)": 26, "Seed": 1, "Series A": 6, "Series B": 5, "Series C": 0, "Top 5 Recent Bets (India)": "Wint Wealth (First Round, Jan 2026); Attentive (Follow-on Round, Nov 2025); Kapiva (Follow-on Round, Sep 2025); Palmonas (First Round, Aug 2025); Kiwi (First Round, Aug 2025)"}, {"Rank": 54, "Fund Name": "pi Ventures", "Portfolio Count (India)": 24, "Total Rounds (India)": 26, "Seed": 12, "Series A": 4, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Aule Space (First Round, Jan 2026); Moonrider (First Round, Dec 2025); LightSpeed Photonics (First Round, Nov 2025); Helex (First Round, Oct 2025); immunitoAI (Follow-on Round, Oct 2025)"}, {"Rank": 55, "Fund Name": "Endiya Partners", "Portfolio Count (India)": 19, "Total Rounds (India)": 26, "Seed": 7, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Nivaan (Follow-on Round, Jan 2026); Matters (First Round, Oct 2025); Maieutic Semiconductors (First Round, Jul 2025); Mylo (Follow-on Round, Jun 2025); Expertia (Follow-on Round, Mar 2025)"}, {"Rank": 56, "Fund Name": "Riverwalk Holdings", "Portfolio Count (India)": 18, "Total Rounds (India)": 26, "Seed": 11, "Series A": 4, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Aerem (Follow-on Round, Jan 2026); Elecbits (First Round, Dec 2025); Tribe (First Round, Nov 2025); Mirana Toys (Follow-on Round, Oct 2025); Fantail (First Round, Jun 2025)"}, {"Rank": 57, "Fund Name": "Gemba Capital", "Portfolio Count (India)": 18, "Total Rounds (India)": 26, "Seed": 14, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "MyNaksh (First Round, Sep 2025); Mannjal (Follow-on Round, Sep 2025); Pazy (First Round, Jun 2025); Eternz (Follow-on Round, Jun 2025); Sanlayan (Follow-on Round, Jun 2025)"}, {"Rank": 58, "Fund Name": "Thapar Vision", "Portfolio Count (India)": 24, "Total Rounds (India)": 26, "Seed": 15, "Series A": 5, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "HerKey (First Round, Nov 2025); Eat Better (First Round, Jun 2025); FAE Beauty (First Round, May 2025); Greenday (First Round, Jan 2025); Palmonas (First Round, Jan 2025)"}, {"Rank": 59, "Fund Name": "Huddle Ventures", "Portfolio Count (India)": 19, "Total Rounds (India)": 25, "Seed": 16, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Cumin (Follow-on Round, Jan 2026); OZi (First Round, Oct 2025); World of Asaya (Follow-on Round, Sep 2025); Cumin (First Round, Aug 2025); Contrails AI (First Round, Aug 2025)"}, {"Rank": 60, "Fund Name": "RTP Global", "Portfolio Count (India)": 19, "Total Rounds (India)": 24, "Seed": 8, "Series A": 6, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "&Done (First Round, Jan 2026); TERN (First Round, Sep 2025); Firstclub (Follow-on Round, Sep 2025); Tuco Kids (First Round, Sep 2025); Vutto (Follow-on Round, Aug 2025)"}, {"Rank": 61, "Fund Name": "Rukam Capital", "Portfolio Count (India)": 20, "Total Rounds (India)": 24, "Seed": 9, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Antinorm (Follow-on Round, Jan 2026); Koriken (First Round, Dec 2025); Nitro Commerce (Follow-on Round, Aug 2025); ZenZebra (First Round, Aug 2025); Fraganote (First Round, Jul 2025)"}, {"Rank": 62, "Fund Name": "1Crowd", "Portfolio Count (India)": 20, "Total Rounds (India)": 24, "Seed": 8, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Mojro (Follow-on Round, Oct 2025); GreenJams (First Round, Jun 2025); Ivory (First Round, Apr 2025); goSTOPS (Follow-on Round, Mar 2025); Zerocircle (Follow-on Round, Jan 2025)"}, {"Rank": 63, "Fund Name": "Saama Capital", "Portfolio Count (India)": 15, "Total Rounds (India)": 24, "Seed": 3, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Gully Labs (First Round, Jan 2026); Koparo Clean (Follow-on Round, Mar 2025); Go Zero (Follow-on Round, Mar 2025); DaMENSCH (Follow-on Round, Jan 2025); Fresh Bus (First Round, Jul 2024)"}, {"Rank": 64, "Fund Name": "Brand Capital", "Portfolio Count (India)": 22, "Total Rounds (India)": 23, "Seed": 11, "Series A": 7, "Series B": 3, "Series C": 0, "Top 5 Recent Bets (India)": "Swap (First Round, Sep 2025); Elever (First Round, Aug 2025); Okbima (First Round, May 2025); ALT (First Round, May 2025); JetSynthesys (First Round, Mar 2025)"}, {"Rank": 65, "Fund Name": "Premji Invest", "Portfolio Count (India)": 16, "Total Rounds (India)": 23, "Seed": 1, "Series A": 1, "Series B": 3, "Series C": 2, "Top 5 Recent Bets (India)": "Emversity (First Round, Jan 2026); Dezerv (Follow-on Round, Oct 2025); GIVA (Follow-on Round, Jun 2025); GlobalBees (Follow-on Round, Apr 2025); Spotdraft Legal (Follow-on Round, Feb 2025)"}, {"Rank": 66, "Fund Name": "YourNest", "Portfolio Count (India)": 20, "Total Rounds (India)": 23, "Seed": 14, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "EtherealX (Follow-on Round, Dec 2025); Perkant Tech (First Round, Apr 2025); Aliste (Follow-on Round, Feb 2025); Map My Crop (First Round, Feb 2025); Presage Insights (First Round, Feb 2025)"}, {"Rank": 67, "Fund Name": "Sparrow Capital", "Portfolio Count (India)": 16, "Total Rounds (India)": 23, "Seed": 13, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Yours Freshly (Follow-on Round, Sep 2025); Mannjal (Follow-on Round, Sep 2025); HomeRun (First Round, Jul 2025); KNOT (First Round, Jul 2025); Aukera (Follow-on Round, Jun 2025)"}, {"Rank": 68, "Fund Name": "Inflexor", "Portfolio Count (India)": 16, "Total Rounds (India)": 22, "Seed": 4, "Series A": 2, "Series B": 1, "Series C": 1, "Top 5 Recent Bets (India)": "Atomberg (Follow-on Round, Dec 2025); Morphle (First Round, Nov 2025); Chakr Innovation (First Round, Sep 2025); CloudSEK (First Round, Apr 2025); Bellatrix Aerospace (Follow-on Round, Mar 2025)"}, {"Rank": 69, "Fund Name": "Multiply Ventures", "Portfolio Count (India)": 17, "Total Rounds (India)": 22, "Seed": 9, "Series A": 1, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Eternz (First Round, Jun 2025); MyDesignation (First Round, Apr 2025); Good Monk (Follow-on Round, Apr 2025); Slikk (First Round, Jan 2025); Superfoods Valley (Follow-on Round, Dec 2024)"}, {"Rank": 70, "Fund Name": "GSF", "Portfolio Count (India)": 19, "Total Rounds (India)": 22, "Seed": 17, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "ExtraMile (First Round, Nov 2025); WelkinRim (First Round, Sep 2025); We360.ai (Follow-on Round, Sep 2025); House Of Zelena (First Round, Sep 2025); Holiday Tribe (Follow-on Round, Aug 2025)"}, {"Rank": 71, "Fund Name": "Finvolve", "Portfolio Count (India)": 19, "Total Rounds (India)": 22, "Seed": 17, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Battwheelz (First Round, Oct 2025); Nitro Commerce (First Round, Aug 2025); Ammunic Systems (First Round, Jul 2025); Rohal Technologies (First Round, May 2025); EzStays (First Round, May 2025)"}, {"Rank": 72, "Fund Name": "Artha Venture Fund", "Portfolio Count (India)": 18, "Total Rounds (India)": 22, "Seed": 8, "Series A": 2, "Series B": 0, "Series C": 1, "Top 5 Recent Bets (India)": "Raana semiconductors (First Round, Jan 2026); TakeMe2Space (Follow-on Round, Dec 2025); AgniKul (Follow-on Round, Nov 2025); Tribe (First Round, Nov 2025); AgniKul (Follow-on Round, Apr 2025)"}, {"Rank": 73, "Fund Name": "Powerhouse Ventures", "Portfolio Count (India)": 13, "Total Rounds (India)": 21, "Seed": 10, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Alive (Follow-on Round, Nov 2025); Holiday Tribe (Follow-on Round, Aug 2025); Holiday Tribe (Follow-on Round, Jul 2025); Swish Club (Follow-on Round, Feb 2025); Settlin (Follow-on Round, Oct 2024)"}, {"Rank": 74, "Fund Name": "Auxano", "Portfolio Count (India)": 14, "Total Rounds (India)": 21, "Seed": 6, "Series A": 3, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "DCGpac (First Round, Jul 2025); Primebook (Follow-on Round, Apr 2025); Primebook (Follow-on Round, Apr 2025); Mugafi (Follow-on Round, Apr 2025); PetStrong (First Round, Oct 2024)"}, {"Rank": 75, "Fund Name": "Arkam Ventures", "Portfolio Count (India)": 17, "Total Rounds (India)": 20, "Seed": 3, "Series A": 6, "Series B": 1, "Series C": 1, "Top 5 Recent Bets (India)": "Optimist (First Round, Jan 2026); Ringg AI (First Round, Jan 2026); Wint Wealth (Follow-on Round, Jan 2026); Mirana Toys (First Round, Oct 2025); Fyno (Follow-on Round, Sep 2025)"}, {"Rank": 76, "Fund Name": "Dexter Ventures", "Portfolio Count (India)": 19, "Total Rounds (India)": 20, "Seed": 10, "Series A": 4, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Meal of the Moment (First Round, Jun 2025); Jewelbox (First Round, Apr 2025); Armory (First Round, Apr 2025); The Bear House (First Round, Mar 2025); CogniQuest (First Round, Feb 2025)"}, {"Rank": 77, "Fund Name": "NABVENTURES", "Portfolio Count (India)": 16, "Total Rounds (India)": 20, "Seed": 5, "Series A": 5, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Fambo (First Round, Sep 2025); Avis Hospitals (First Round, Jul 2025); Eggoz (Follow-on Round, Jun 2025); KBCols  Sciences (Follow-on Round, Jun 2025); JustDeliveries (Follow-on Round, May 2025)"}, {"Rank": 78, "Fund Name": "V3 Ventures", "Portfolio Count (India)": 15, "Total Rounds (India)": 20, "Seed": 9, "Series A": 5, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Antinorm (Follow-on Round, Jan 2026); Be Clinical (First Round, Jan 2026); SuperYou (First Round, Dec 2025); Earthful (First Round, Nov 2025); Dil Foods (Follow-on Round, Aug 2025)"}, {"Rank": 79, "Fund Name": "Aarem  Ventures", "Portfolio Count (India)": 19, "Total Rounds (India)": 20, "Seed": 11, "Series A": 5, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Arise (First Round, Aug 2025); Shoption (First Round, May 2025); Smart Joules (First Round, May 2025); Zerocircle (First Round, Nov 2024); MOOEV Technologies (First Round, Oct 2024)"}, {"Rank": 80, "Fund Name": "8i Ventures", "Portfolio Count (India)": 13, "Total Rounds (India)": 20, "Seed": 10, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Grest (First Round, Jan 2026); Dalvoy (First Round, Jan 2026); Blinq Mobility (First Round, Dec 2025); PowerUp Money (Follow-on Round, Dec 2025); Oolka (Follow-on Round, Sep 2025)"}, {"Rank": 81, "Fund Name": "OTP Ventures", "Portfolio Count (India)": 19, "Total Rounds (India)": 20, "Seed": 16, "Series A": 2, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "World of Asaya (Follow-on Round, Sep 2025); Plush (First Round, Jun 2025); Phab (First Round, Apr 2025); Zeelab Pharmacy (First Round, Jan 2025); LifeGuru (First Round, Aug 2024)"}, {"Rank": 82, "Fund Name": "Good Capital", "Portfolio Count (India)": 16, "Total Rounds (India)": 20, "Seed": 12, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Nuuk (Follow-on Round, Aug 2025); Babynama (First Round, Feb 2025); axiTrust (First Round, Feb 2025); Propacity (Follow-on Round, Feb 2025); OctoLife (First Round, Sep 2024)"}, {"Rank": 83, "Fund Name": "Equanimity Investments", "Portfolio Count (India)": 13, "Total Rounds (India)": 19, "Seed": 11, "Series A": 1, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Neuron Energy (Follow-on Round, Nov 2025); Stockarea (First Round, Nov 2025); Navata Supply Chain Solutions (Follow-on Round, Jul 2025); Neuron Energy (Follow-on Round, Jun 2025); ConsInt (Follow-on Round, Jan 2025)"}, {"Rank": 84, "Fund Name": "Mount Judi Ventures", "Portfolio Count (India)": 12, "Total Rounds (India)": 19, "Seed": 6, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Hexalog (First Round, Jan 2026); ExtraMile (First Round, Nov 2025); Thimblerr (Follow-on Round, Oct 2025); Dil Foods (Follow-on Round, Aug 2025); Boingg (First Round, Jun 2025)"}, {"Rank": 85, "Fund Name": "Eight Roads Ventures", "Portfolio Count (India)": 15, "Total Rounds (India)": 19, "Seed": 0, "Series A": 2, "Series B": 2, "Series C": 1, "Top 5 Recent Bets (India)": "AssetPlus (Follow-on Round, Jan 2026); Wint Wealth (Follow-on Round, Jan 2026); BlissClub (Follow-on Round, May 2025); Laurus Bio (First Round, Dec 2024); Bhanzu (Follow-on Round, Nov 2024)"}, {"Rank": 86, "Fund Name": "Athera", "Portfolio Count (India)": 16, "Total Rounds (India)": 19, "Seed": 3, "Series A": 4, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "HiFy (First Round, Jul 2025); Euler Motors (Follow-on Round, May 2025); Windo (First Round, Mar 2025); Beacon (First Round, Mar 2025); VuNet Systems (Follow-on Round, Jan 2025)"}, {"Rank": 87, "Fund Name": "Cornerstone Ventures", "Portfolio Count (India)": 14, "Total Rounds (India)": 19, "Seed": 2, "Series A": 4, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Nitro Commerce (Follow-on Round, Aug 2025); Sharpsell (Follow-on Round, Jun 2025); OfBusiness (First Round, Apr 2025); Credilio (Follow-on Round, Jan 2025); Dopplr (First Round, Aug 2024)"}, {"Rank": 88, "Fund Name": "Spring", "Portfolio Count (India)": 16, "Total Rounds (India)": 19, "Seed": 10, "Series A": 2, "Series B": 1, "Series C": 3, "Top 5 Recent Bets (India)": "Troovy (Follow-on Round, Jan 2026); SkinInspired (First Round, Jan 2026); FAE Beauty (First Round, Nov 2025); Shree Anandhaas (First Round, Sep 2025); Lucira Jewelry (First Round, Sep 2025)"}, {"Rank": 89, "Fund Name": "Dholakia Ventures", "Portfolio Count (India)": 18, "Total Rounds (India)": 19, "Seed": 10, "Series A": 2, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Pavakah Energy (First Round, Nov 2025); WTF Gyms (First Round, Jul 2024); Unikon Innovations (First Round, Jun 2024); BizzTM (First Round, May 2024); Ghost Kitchens (Follow-on Round, Feb 2024)"}, {"Rank": 90, "Fund Name": "SIDBI Venture Capital", "Portfolio Count (India)": 16, "Total Rounds (India)": 18, "Seed": 4, "Series A": 6, "Series B": 1, "Series C": 2, "Top 5 Recent Bets (India)": "Nourish You (Follow-on Round, Mar 2025); VAHDAM (First Round, Feb 2025); Nourish You (First Round, Feb 2025); Ukhi (First Round, Oct 2024); Zerund brick (First Round, Sep 2024)"}, {"Rank": 91, "Fund Name": "Orios Venture Partners", "Portfolio Count (India)": 16, "Total Rounds (India)": 18, "Seed": 2, "Series A": 6, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Truva (First Round, Dec 2025); WickedGud (Follow-on Round, Dec 2025); ScrapUncle (First Round, Jul 2025); Unnati (Follow-on Round, Feb 2025); Suite42 (Follow-on Round, Feb 2025)"}, {"Rank": 92, "Fund Name": "Bertelsmann India Investments", "Portfolio Count (India)": 15, "Total Rounds (India)": 18, "Seed": 0, "Series A": 4, "Series B": 7, "Series C": 1, "Top 5 Recent Bets (India)": "Inito (First Round, Dec 2025); Wealthy (First Round, Nov 2025); TETR (First Round, Nov 2025); Snabbit (First Round, Oct 2025); Handpickd (First Round, Sep 2025)"}, {"Rank": 93, "Fund Name": "Eximius Ventures", "Portfolio Count (India)": 16, "Total Rounds (India)": 18, "Seed": 12, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "CuePilot (First Round, Dec 2025); MyNaksh (First Round, Sep 2025); STAN (Follow-on Round, Jul 2025); Handpickd (First Round, Jun 2025); Shuru (Follow-on Round, May 2025)"}, {"Rank": 94, "Fund Name": "AdvantEdge", "Portfolio Count (India)": 11, "Total Rounds (India)": 18, "Seed": 6, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Moonrider (Follow-on Round, Dec 2025); Ambak (Follow-on Round, Nov 2025); Pulse Energy (Follow-on Round, May 2025); Astranova Mobility (Follow-on Round, Mar 2025); Grip Invest (Follow-on Round, Jan 2025)"}, {"Rank": 95, "Fund Name": "Navam Capital", "Portfolio Count (India)": 14, "Total Rounds (India)": 18, "Seed": 7, "Series A": 4, "Series B": 2, "Series C": 0, "Top 5 Recent Bets (India)": "Unbox Robotics (Follow-on Round, Jan 2026); Morphing Machines (Follow-on Round, Sep 2025); SecureMachines (First Round, Aug 2025); Gyroid Photonics (Follow-on Round, Jul 2025); Frinks AI (First Round, Apr 2025)"}, {"Rank": 96, "Fund Name": "Sixth Sense Ventures", "Portfolio Count (India)": 17, "Total Rounds (India)": 18, "Seed": 0, "Series A": 6, "Series B": 1, "Series C": 0, "Top 5 Recent Bets (India)": "Bombay Shaving (Follow-on Round, Nov 2025); Eeki (First Round, Jun 2025); Candytoy (First Round, Nov 2024); SM Toys (First Round, Nov 2024); XtraNet Technologies (First Round, Sep 2024)"}, {"Rank": 97, "Fund Name": "Capital 2B", "Portfolio Count (India)": 12, "Total Rounds (India)": 17, "Seed": 8, "Series A": 3, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Ringg AI (Follow-on Round, Jan 2026); Manastu Space (Follow-on Round, Aug 2025); Leumas (Follow-on Round, Jun 2025); Ringg AI (First Round, Apr 2025); Pantherun (Follow-on Round, Feb 2025)"}, {"Rank": 98, "Fund Name": "PeerCapital", "Portfolio Count (India)": 15, "Total Rounds (India)": 17, "Seed": 10, "Series A": 5, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Game State Labs (First Round, Aug 2025); Vaaree (Follow-on Round, Jul 2025); Redacto (First Round, Apr 2025); TyrePlex (Follow-on Round, Mar 2025); TyrePlex (First Round, Dec 2024)"}, {"Rank": 99, "Fund Name": "Zeropearl", "Portfolio Count (India)": 15, "Total Rounds (India)": 17, "Seed": 15, "Series A": 0, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "Gully Labs (Follow-on Round, Jan 2026); Frex (First Round, Dec 2025); Onya (First Round, Nov 2025); OZi (First Round, Oct 2025); Affluense (First Round, Oct 2025)"}, {"Rank": 100, "Fund Name": "Anthill Ventures", "Portfolio Count (India)": 14, "Total Rounds (India)": 17, "Seed": 9, "Series A": 2, "Series B": 0, "Series C": 0, "Top 5 Recent Bets (India)": "WeHouse (Follow-on Round, Sep 2025); WeHouse (Follow-on Round, Sep 2025); Aethermt (First Round, Aug 2025); Cureous (First Round, Aug 2025); NOTO (First Round, Oct 2024)"}];
+
+        const sectorData = [{"Sector": "Consumer", "#1 Fund": "Venture Catalysts (95)", "#2 Fund": "Inflection Point Ventures (86)", "#3 Fund": "Titan Capital (65)", "#4 Fund": "Blume Venture (56)", "#5 Fund": "QED Innovation Labs (48)", "#6 Fund": "We Founder Circle (44)", "#7 Fund": "Peak XV Partners (44)", "#8 Fund": "Firstport Capital (44)", "#9 Fund": "100X.VC (43)", "#10 Fund": "Fireside Ventures (43)"}, {"Sector": "Enterprise Applications", "#1 Fund": "Inflection Point Ventures (59)", "#2 Fund": "Blume Venture (57)", "#3 Fund": "Venture Catalysts (56)", "#4 Fund": "100X.VC (49)", "#5 Fund": "Titan Capital (48)", "#6 Fund": "QED Innovation Labs (46)", "#7 Fund": "Peak XV Partners (45)", "#8 Fund": "IIMA Ventures (40)", "#9 Fund": "We Founder Circle (33)", "#10 Fund": "Accel (31)"}, {"Sector": "Retail", "#1 Fund": "Venture Catalysts (72)", "#2 Fund": "Inflection Point Ventures (54)", "#3 Fund": "Titan Capital (52)", "#4 Fund": "Fireside Ventures (43)", "#5 Fund": "Blume Venture (37)", "#6 Fund": "100X.VC (35)", "#7 Fund": "QED Innovation Labs (32)", "#8 Fund": "Peak XV Partners (31)", "#9 Fund": "Firstport Capital (29)", "#10 Fund": "Better Capital (29)"}, {"Sector": "High Tech", "#1 Fund": "Venture Catalysts (44)", "#2 Fund": "IIMA Ventures (36)", "#3 Fund": "Inflection Point Ventures (33)", "#4 Fund": "100X.VC (28)", "#5 Fund": "Soonicorn Ventures (25)", "#6 Fund": "Blume Venture (24)", "#7 Fund": "Peak XV Partners (19)", "#8 Fund": "Rainmatter (18)", "#9 Fund": "Speciale Invest (17)", "#10 Fund": "pi Ventures (17)"}, {"Sector": "FinTech", "#1 Fund": "QED Innovation Labs (43)", "#2 Fund": "Blume Venture (34)", "#3 Fund": "Peak XV Partners (29)", "#4 Fund": "Venture Catalysts (27)", "#5 Fund": "Accel (23)", "#6 Fund": "Rainmatter (22)", "#7 Fund": "Inflection Point Ventures (21)", "#8 Fund": "Better Capital (19)", "#9 Fund": "Z47 (18)", "#10 Fund": "Elevation Capital (17)"}, {"Sector": "Consumer Goods", "#1 Fund": "Venture Catalysts (29)", "#2 Fund": "Fireside Ventures (29)", "#3 Fund": "Inflection Point Ventures (25)", "#4 Fund": "DSG Consumer Partners (23)", "#5 Fund": "Titan Capital (17)", "#6 Fund": "OTP Ventures (17)", "#7 Fund": "100X.VC (16)", "#8 Fund": "Firstport Capital (16)", "#9 Fund": "Sixth Sense Ventures (16)", "#10 Fund": "Rainmatter (15)"}, {"Sector": "Food and Agriculture Tech", "#1 Fund": "Omnivore (27)", "#2 Fund": "Venture Catalysts (21)", "#3 Fund": "Inflection Point Ventures (20)", "#4 Fund": "Blume Venture (17)", "#5 Fund": "Rainmatter (17)", "#6 Fund": "Soonicorn Ventures (15)", "#7 Fund": "IIMA Ventures (14)", "#8 Fund": "Better Capital (13)", "#9 Fund": "Brand Capital (13)", "#10 Fund": "Firstport Capital (12)"}, {"Sector": "Environment Tech", "#1 Fund": "Venture Catalysts (25)", "#2 Fund": "Rainmatter (22)", "#3 Fund": "IIMA Ventures (22)", "#4 Fund": "Soonicorn Ventures (20)", "#5 Fund": "Inflection Point Ventures (18)", "#6 Fund": "Avaana Capital Advisors (14)", "#7 Fund": "Blume Venture (13)", "#8 Fund": "Aarem  Ventures (13)", "#9 Fund": "We Founder Circle (12)", "#10 Fund": "Gruhas (11)"}, {"Sector": "HealthTech", "#1 Fund": "Inflection Point Ventures (21)", "#2 Fund": "Blume Venture (15)", "#3 Fund": "Rainmatter (15)", "#4 Fund": "Venture Catalysts (14)", "#5 Fund": "IIMA Ventures (13)", "#6 Fund": "QED Innovation Labs (13)", "#7 Fund": "Accel (10)", "#8 Fund": "Brand Capital (10)", "#9 Fund": "Better Capital (9)", "#10 Fund": "We Founder Circle (8)"}, {"Sector": "Transportation and Logistics Tech", "#1 Fund": "Inflection Point Ventures (26)", "#2 Fund": "Venture Catalysts (24)", "#3 Fund": "Soonicorn Ventures (17)", "#4 Fund": "We Founder Circle (13)", "#5 Fund": "Blume Venture (13)", "#6 Fund": "Firstport Capital (11)", "#7 Fund": "AdvantEdge (10)", "#8 Fund": "3one4 Capital (9)", "#9 Fund": "IIMA Ventures (9)", "#10 Fund": "Capital-A (8)"}, {"Sector": "Food and Agriculture", "#1 Fund": "Venture Catalysts (19)", "#2 Fund": "Rainmatter (16)", "#3 Fund": "Inflection Point Ventures (14)", "#4 Fund": "Fireside Ventures (14)", "#5 Fund": "DSG Consumer Partners (13)", "#6 Fund": "100X.VC (11)", "#7 Fund": "Firstport Capital (10)", "#8 Fund": "Titan Capital (10)", "#9 Fund": "Soonicorn Ventures (9)", "#10 Fund": "Peak XV Partners (7)"}, {"Sector": "Auto Tech", "#1 Fund": "Inflection Point Ventures (16)", "#2 Fund": "Venture Catalysts (15)", "#3 Fund": "Blume Venture (13)", "#4 Fund": "We Founder Circle (10)", "#5 Fund": "AdvantEdge (10)", "#6 Fund": "Soonicorn Ventures (9)", "#7 Fund": "Accel (6)", "#8 Fund": "Peak XV Partners (6)", "#9 Fund": "IIMA Ventures (6)", "#10 Fund": "QED Innovation Labs (6)"}, {"Sector": "Financial Services", "#1 Fund": "Venture Catalysts (14)", "#2 Fund": "Peak XV Partners (13)", "#3 Fund": "Z47 (9)", "#4 Fund": "Elevation Capital (9)", "#5 Fund": "QED Innovation Labs (9)", "#6 Fund": "Omidyar Network India (9)", "#7 Fund": "Premji Invest (9)", "#8 Fund": "Accel (7)", "#9 Fund": "Blume Venture (6)", "#10 Fund": "Info Edge Ventures (6)"}, {"Sector": "Energy Tech", "#1 Fund": "IIMA Ventures (15)", "#2 Fund": "Inflection Point Ventures (14)", "#3 Fund": "Venture Catalysts (14)", "#4 Fund": "Soonicorn Ventures (11)", "#5 Fund": "Blume Venture (9)", "#6 Fund": "Gruhas (9)", "#7 Fund": "Aarem  Ventures (8)", "#8 Fund": "We Founder Circle (7)", "#9 Fund": "Avaana Capital Advisors (7)", "#10 Fund": "Rainmatter (6)"}, {"Sector": "EdTech", "#1 Fund": "QED Innovation Labs (11)", "#2 Fund": "We Founder Circle (8)", "#3 Fund": "Blume Venture (8)", "#4 Fund": "Lightspeed Venture Partners (8)", "#5 Fund": "Inflection Point Ventures (7)", "#6 Fund": "Peak XV Partners (7)", "#7 Fund": "Brand Capital (7)", "#8 Fund": "IIMA Ventures (6)", "#9 Fund": "Lead Angels (6)", "#10 Fund": "Better Capital (6)"}, {"Sector": "Real Estate and Construction Tech", "#1 Fund": "Inflection Point Ventures (10)", "#2 Fund": "Accel (9)", "#3 Fund": "Gruhas (9)", "#4 Fund": "Venture Catalysts (7)", "#5 Fund": "Brand Capital (7)", "#6 Fund": "Blume Venture (6)", "#7 Fund": "Peak XV Partners (6)", "#8 Fund": "Z47 (6)", "#9 Fund": "Firstport Capital (6)", "#10 Fund": "IIMA Ventures (6)"}, {"Sector": "Media & Entertainment", "#1 Fund": "Venture Catalysts (9)", "#2 Fund": "We Founder Circle (8)", "#3 Fund": "QED Innovation Labs (7)", "#4 Fund": "100X.VC (6)", "#5 Fund": "Info Edge Ventures (6)", "#6 Fund": "Omidyar Network India (6)", "#7 Fund": "Titan Capital (5)", "#8 Fund": "Lead Angels (5)", "#9 Fund": "Better Capital (5)", "#10 Fund": "Brand Capital (5)"}, {"Sector": "Industrial Goods and Manufacturing", "#1 Fund": "Inflection Point Ventures (9)", "#2 Fund": "Accel (9)", "#3 Fund": "Venture Catalysts (8)", "#4 Fund": "IIMA Ventures (7)", "#5 Fund": "Titan Capital (6)", "#6 Fund": "DeVC (5)", "#7 Fund": "Capital-A (5)", "#8 Fund": "Blume Venture (4)", "#9 Fund": "1Crowd (4)", "#10 Fund": "YourNest (4)"}, {"Sector": "Travel and Hospitality Tech", "#1 Fund": "Inflection Point Ventures (14)", "#2 Fund": "Venture Catalysts (8)", "#3 Fund": "Peak XV Partners (8)", "#4 Fund": "We Founder Circle (7)", "#5 Fund": "Blume Venture (6)", "#6 Fund": "Soonicorn Ventures (5)", "#7 Fund": "Firstport Capital (4)", "#8 Fund": "Info Edge Ventures (4)", "#9 Fund": "QED Innovation Labs (4)", "#10 Fund": "AdvantEdge (4)"}, {"Sector": "Enterprise Infrastructure", "#1 Fund": "Blume Venture (10)", "#2 Fund": "100X.VC (7)", "#3 Fund": "Peak XV Partners (6)", "#4 Fund": "PointOne Capital (6)", "#5 Fund": "Accel (5)", "#6 Fund": "Unicorn India Ventures (5)", "#7 Fund": "Elevation Capital (4)", "#8 Fund": "Kalaari Capital (4)", "#9 Fund": "Better Capital (4)", "#10 Fund": "Inflection Point Ventures (3)"}, {"Sector": "Gig Economy", "#1 Fund": "Blume Venture (10)", "#2 Fund": "QED Innovation Labs (8)", "#3 Fund": "Inflection Point Ventures (7)", "#4 Fund": "Peak XV Partners (6)", "#5 Fund": "Brand Capital (6)", "#6 Fund": "Venture Catalysts (5)", "#7 Fund": "Accel (5)", "#8 Fund": "3one4 Capital (4)", "#9 Fund": "Nexus Venture Partners (4)", "#10 Fund": "We Founder Circle (3)"}, {"Sector": "Auto", "#1 Fund": "Blume Venture (5)", "#2 Fund": "Venture Catalysts (4)", "#3 Fund": "Titan Capital (4)", "#4 Fund": "QED Innovation Labs (3)", "#5 Fund": "Avaana Capital Advisors (3)", "#6 Fund": "Brand Capital (3)", "#7 Fund": "GSF (3)", "#8 Fund": "Inflection Point Ventures (2)", "#9 Fund": "We Founder Circle (2)", "#10 Fund": "Accel (2)"}, {"Sector": "Life Sciences", "#1 Fund": "IIMA Ventures (10)", "#2 Fund": "Fireside Ventures (6)", "#3 Fund": "Endiya Partners (5)", "#4 Fund": "Accel (4)", "#5 Fund": "Chiratae Ventures (4)", "#6 Fund": "pi Ventures (4)", "#7 Fund": "Brand Capital (4)", "#8 Fund": "Rainmatter (3)", "#9 Fund": "100X.VC (3)", "#10 Fund": "3one4 Capital (3)"}, {"Sector": "Healthcare", "#1 Fund": "Peak XV Partners (6)", "#2 Fund": "Eight Roads Ventures (5)", "#3 Fund": "Venture Catalysts (4)", "#4 Fund": "Chiratae Ventures (4)", "#5 Fund": "Bessemer Venture Partners (4)", "#6 Fund": "We Founder Circle (3)", "#7 Fund": "Z47 (3)", "#8 Fund": "100X.VC (3)", "#9 Fund": "IIMA Ventures (3)", "#10 Fund": "Brand Capital (3)"}, {"Sector": "Mobile", "#1 Fund": "Kalaari Capital (5)", "#2 Fund": "QED Innovation Labs (5)", "#3 Fund": "Blume Venture (3)", "#4 Fund": "Info Edge Ventures (3)", "#5 Fund": "DeVC (3)", "#6 Fund": "Better Capital (3)", "#7 Fund": "Kae Capital (3)", "#8 Fund": "Inflection Point Ventures (2)", "#9 Fund": "Peak XV Partners (2)", "#10 Fund": "Z47 (2)"}, {"Sector": "Gaming", "#1 Fund": "QED Innovation Labs (6)", "#2 Fund": "100X.VC (4)", "#3 Fund": "Eximius Ventures (4)", "#4 Fund": "Info Edge Ventures (3)", "#5 Fund": "Better Capital (3)", "#6 Fund": "SucSEED Indovation (3)", "#7 Fund": "Inflection Point Ventures (2)", "#8 Fund": "We Founder Circle (2)", "#9 Fund": "Blume Venture (2)", "#10 Fund": "Peak XV Partners (2)"}, {"Sector": "InsurTech", "#1 Fund": "Blume Venture (3)", "#2 Fund": "Accel (3)", "#3 Fund": "Elevation Capital (3)", "#4 Fund": "Titan Capital (3)", "#5 Fund": "QED Innovation Labs (3)", "#6 Fund": "Capital-A (3)", "#7 Fund": "Bessemer Venture Partners (3)", "#8 Fund": "Inflection Point Ventures (2)", "#9 Fund": "Peak XV Partners (2)", "#10 Fund": "Rainmatter (2)"}, {"Sector": "Chemicals and Materials Tech", "#1 Fund": "Venture Catalysts (4)", "#2 Fund": "Rainmatter (4)", "#3 Fund": "IIMA Ventures (4)", "#4 Fund": "Aarem  Ventures (4)", "#5 Fund": "3one4 Capital (3)", "#6 Fund": "Z47 (2)", "#7 Fund": "Info Edge Ventures (2)", "#8 Fund": "Soonicorn Ventures (2)", "#9 Fund": "Axilor Ventures (2)", "#10 Fund": "Speciale Invest (2)"}, {"Sector": "Semiconductors", "#1 Fund": "IIMA Ventures (3)", "#2 Fund": "Speciale Invest (3)", "#3 Fund": "Peak XV Partners (2)", "#4 Fund": "Z47 (2)", "#5 Fund": "3one4 Capital (2)", "#6 Fund": "DeVC (2)", "#7 Fund": "IvyCap Ventures Advisors (2)", "#8 Fund": "Whiteboard Capital (2)", "#9 Fund": "PointOne Capital (2)", "#10 Fund": "Shastra (2)"}, {"Sector": "Environment", "#1 Fund": "Rainmatter (5)", "#2 Fund": "Venture Catalysts (3)", "#3 Fund": "Inflection Point Ventures (2)", "#4 Fund": "Firstport Capital (2)", "#5 Fund": "IIMA Ventures (2)", "#6 Fund": "Speciale Invest (2)", "#7 Fund": "Aarem  Ventures (2)", "#8 Fund": "Z47 (1)", "#9 Fund": "100X.VC (1)", "#10 Fund": "Info Edge Ventures (1)"}, {"Sector": "Business Services", "#1 Fund": "Inflection Point Ventures (3)", "#2 Fund": "Accel (2)", "#3 Fund": "Gruhas (2)", "#4 Fund": "Pontaq (2)", "#5 Fund": "Sixth Sense Ventures (2)", "#6 Fund": "Blume Venture (1)", "#7 Fund": "Venture Catalysts (1)", "#8 Fund": "Peak XV Partners (1)", "#9 Fund": "Firstport Capital (1)", "#10 Fund": "Info Edge Ventures (1)"}, {"Sector": "Energy", "#1 Fund": "Venture Catalysts (2)", "#2 Fund": "Pontaq (2)", "#3 Fund": "Rainmatter (1)", "#4 Fund": "100X.VC (1)", "#5 Fund": "Elevation Capital (1)", "#6 Fund": "Lightspeed Venture Partners (1)", "#7 Fund": "Gruhas (1)", "#8 Fund": "IIMA Ventures (1)", "#9 Fund": "Omnivore (1)", "#10 Fund": "Prime Venture Partners (1)"}, {"Sector": "Real Estate and Construction", "#1 Fund": "Brand Capital (5)", "#2 Fund": "Gruhas (2)", "#3 Fund": "Inflection Point Ventures (1)", "#4 Fund": "Venture Catalysts (1)", "#5 Fund": "Rainmatter (1)", "#6 Fund": "Firstport Capital (1)", "#7 Fund": "Titan Capital (1)", "#8 Fund": "India Quotient (1)", "#9 Fund": "Kalaari Capital (1)", "#10 Fund": "Stellaris Venture Partners (1)"}, {"Sector": "Chemicals and Materials", "#1 Fund": "Accel (2)", "#2 Fund": "3one4 Capital (2)", "#3 Fund": "SiriusOne (2)", "#4 Fund": "Shastra (2)", "#5 Fund": "Inflection Point Ventures (1)", "#6 Fund": "Venture Catalysts (1)", "#7 Fund": "Firstport Capital (1)", "#8 Fund": "All In Capital (1)", "#9 Fund": "India Quotient (1)", "#10 Fund": "Omnivore (1)"}, {"Sector": "Blockchain Technology", "#1 Fund": "100X.VC (3)", "#2 Fund": "We Founder Circle (1)", "#3 Fund": "Elevation Capital (1)", "#4 Fund": "Soonicorn Ventures (1)", "#5 Fund": "Lightspeed Venture Partners (1)", "#6 Fund": "Gruhas (1)", "#7 Fund": "QED Innovation Labs (1)", "#8 Fund": "Pontaq (1)", "#9 Fund": "Campus Fund (1)", "#10 Fund": "Artha Venture Fund (1)"}, {"Sector": "Education", "#1 Fund": "Peak XV Partners (3)", "#2 Fund": "Brand Capital (2)", "#3 Fund": "3one4 Capital (1)", "#4 Fund": "Gruhas (1)", "#5 Fund": "SiriusOne (1)", "#6 Fund": "Omidyar Network India (1)", "#7 Fund": "Equanimity Investments (1)", "#8 Fund": "Cornerstone Ventures (1)", "#9 Fund": "Bertelsmann India Investments (1)", "#10 Fund": ""}, {"Sector": "Telecom", "#1 Fund": "YourNest (2)", "#2 Fund": "Blume Venture (1)", "#3 Fund": "Venture Catalysts (1)", "#4 Fund": "Accel (1)", "#5 Fund": "3one4 Capital (1)", "#6 Fund": "RTP Global (1)", "#7 Fund": "Auxano (1)", "#8 Fund": "Bertelsmann India Investments (1)", "#9 Fund": "", "#10 Fund": ""}, {"Sector": "Travel and Hospitality", "#1 Fund": "Accel (1)", "#2 Fund": "Soonicorn Ventures (1)", "#3 Fund": "Titan Capital (1)", "#4 Fund": "Campus Fund (1)", "#5 Fund": "Brand Capital (1)", "#6 Fund": "Premji Invest (1)", "#7 Fund": "", "#8 Fund": "", "#9 Fund": "", "#10 Fund": ""}, {"Sector": "Transportation and Logistics", "#1 Fund": "Venture Catalysts (1)", "#2 Fund": "Soonicorn Ventures (1)", "#3 Fund": "Premji Invest (1)", "#4 Fund": "NABVENTURES (1)", "#5 Fund": "Sixth Sense Ventures (1)", "#6 Fund": "", "#7 Fund": "", "#8 Fund": "", "#9 Fund": "", "#10 Fund": ""}, {"Sector": "Nonprofits", "#1 Fund": "Gruhas (1)", "#2 Fund": "DeVC (1)", "#3 Fund": "IIMA Ventures (1)", "#4 Fund": "Better Capital (1)", "#5 Fund": "Riverwalk Holdings (1)", "#6 Fund": "", "#7 Fund": "", "#8 Fund": "", "#9 Fund": "", "#10 Fund": ""}, {"Sector": "Mining", "#1 Fund": "Inflection Point Ventures (1)", "#2 Fund": "Firstport Capital (1)", "#3 Fund": "Campus Fund (1)", "#4 Fund": "", "#5 Fund": "", "#6 Fund": "", "#7 Fund": "", "#8 Fund": "", "#9 Fund": "", "#10 Fund": ""}];
+
+        let filteredData = [...fundsData];
+        let currentSort = { field: 'rank', ascending: true };
+
+        // Create stars
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                star.style.setProperty('--min-opacity', Math.random() * 0.3 + 0.1);
+                star.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(star);
+            }
+
+            // Add shooting stars
+            for (let i = 0; i < 3; i++) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                shootingStar.style.left = Math.random() * 50 + '%';
+                shootingStar.style.top = Math.random() * 30 + '%';
+                shootingStar.style.animationDelay = (Math.random() * 10 + i * 5) + 's';
+                container.appendChild(shootingStar);
+            }
+        }
+
+        // Calculate stats
+        function calculateStats() {
+            const totalPortfolio = fundsData.reduce((sum, f) => sum + f['Portfolio Count (India)'], 0);
+            const totalRounds = fundsData.reduce((sum, f) => sum + f['Total Rounds (India)'], 0);
+            const totalSeed = fundsData.reduce((sum, f) => sum + f['Seed'], 0);
+            
+            document.getElementById('totalPortfolio').textContent = totalPortfolio.toLocaleString();
+            document.getElementById('totalRounds').textContent = totalRounds.toLocaleString();
+            document.getElementById('totalSeed').textContent = totalSeed.toLocaleString();
+        }
+
+        // Create top 3 showcase
+        function createShowcase() {
+            const top3 = fundsData.slice(0, 3);
+            const ranks = ['#1', '#2', '#3'];
+            
+            top3.forEach((fund, index) => {
+                const card = document.getElementById(`showcase-${index + 1}`);
+                card.innerHTML = `
+                    <div class="showcase-rank">${ranks[index]}</div>
+                    <div class="showcase-name">${fund['Fund Name']}</div>
+                    <div class="showcase-stats">
+                        <div class="showcase-stat">
+                            <div class="showcase-stat-value">${fund['Portfolio Count (India)']}</div>
+                            <div class="showcase-stat-label">Portfolio</div>
+                        </div>
+                        <div class="showcase-stat">
+                            <div class="showcase-stat-value">${fund['Total Rounds (India)']}</div>
+                            <div class="showcase-stat-label">Rounds</div>
+                        </div>
+                        <div class="showcase-stat">
+                            <div class="showcase-stat-value">${fund['Seed']}</div>
+                            <div class="showcase-stat-label">Seed</div>
+                        </div>
+                        <div class="showcase-stat">
+                            <div class="showcase-stat-value">${fund['Series A']}</div>
+                            <div class="showcase-stat-label">Series A</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Create infographics
+        function createInfographics() {
+            const portfolioSorted = [...fundsData].sort((a, b) => b['Portfolio Count (India)'] - a['Portfolio Count (India)']).slice(0, 10);
+            const roundsSorted = [...fundsData].sort((a, b) => b['Total Rounds (India)'] - a['Total Rounds (India)']).slice(0, 10);
+            
+            const maxPortfolio = portfolioSorted[0]['Portfolio Count (India)'];
+            const maxRounds = roundsSorted[0]['Total Rounds (India)'];
+            
+            document.getElementById('portfolioInfographic').innerHTML = portfolioSorted.map(f => `
+                <div class="infographic-bar-item">
+                    <div class="infographic-bar-label">${f['Fund Name']}</div>
+                    <div class="infographic-bar-track">
+                        <div class="infographic-bar-fill" style="width: ${(f['Portfolio Count (India)'] / maxPortfolio) * 100}%">
+                            ${f['Portfolio Count (India)']}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('roundsInfographic').innerHTML = roundsSorted.map(f => `
+                <div class="infographic-bar-item">
+                    <div class="infographic-bar-label">${f['Fund Name']}</div>
+                    <div class="infographic-bar-track">
+                        <div class="infographic-bar-fill" style="width: ${(f['Total Rounds (India)'] / maxRounds) * 100}%">
+                            ${f['Total Rounds (India)']}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Create charts
+        function createCharts() {
+            // Comparative chart
+            const top15 = fundsData.slice(0, 15);
+            const compCtx = document.getElementById('comparativeChart').getContext('2d');
+            new Chart(compCtx, {
+                type: 'bar',
+                data: {
+                    labels: top15.map(f => f['Fund Name'].split(' ').slice(0, 2).join(' ')),
+                    datasets: [
+                        {
+                            label: 'Seed',
+                            data: top15.map(f => f['Seed']),
+                            backgroundColor: 'rgba(255, 45, 117, 0.8)',
+                        },
+                        {
+                            label: 'Series A',
+                            data: top15.map(f => f['Series A']),
+                            backgroundColor: 'rgba(157, 78, 221, 0.8)',
+                        },
+                        {
+                            label: 'Series B',
+                            data: top15.map(f => f['Series B']),
+                            backgroundColor: 'rgba(0, 217, 255, 0.8)',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f0e6ff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: { color: '#a89bb5', maxRotation: 45, minRotation: 45 },
+                            grid: { display: false }
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: { color: '#a89bb5' },
+                            grid: { color: 'rgba(255, 107, 157, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('fundsTableBody');
+            const maxPortfolio = Math.max(...fundsData.map(f => f['Portfolio Count (India)']));
+            const maxRounds = Math.max(...fundsData.map(f => f['Total Rounds (India)']));
+            
+            tbody.innerHTML = filteredData.map(fund => {
+                const rankClass = fund.Rank <= 3 ? `rank-${fund.Rank}` : 'rank-other';
+                return `
+                    <tr>
+                        <td><span class="rank-badge ${rankClass}">${fund.Rank}</span></td>
+                        <td><span class="fund-name">${fund['Fund Name']}</span></td>
+                        <td>
+                            <div class="metric-bar">
+                                <span>${fund['Portfolio Count (India)']}</span>
+                                <div class="bar-fill" style="width: ${(fund['Portfolio Count (India)'] / maxPortfolio) * 80}px"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-bar">
+                                <span>${fund['Total Rounds (India)']}</span>
+                                <div class="bar-fill" style="width: ${(fund['Total Rounds (India)'] / maxRounds) * 80}px"></div>
+                            </div>
+                        </td>
+                        <td>${fund['Seed']}</td>
+                        <td>${fund['Series A']}</td>
+                        <td>${fund['Series B']}</td>
+                        <td>${fund['Series C']}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Sort data
+        function sortData(field) {
+            const fieldMap = {
+                'rank': 'Rank',
+                'name': 'Fund Name',
+                'portfolio': 'Portfolio Count (India)',
+                'rounds': 'Total Rounds (India)',
+                'seed': 'Seed',
+                'seriesA': 'Series A',
+                'seriesB': 'Series B',
+                'seriesC': 'Series C'
+            };
+            
+            const dataField = fieldMap[field];
+            const ascending = currentSort.field === field ? !currentSort.ascending : (field === 'name');
+            
+            filteredData.sort((a, b) => {
+                if (typeof a[dataField] === 'string') {
+                    return ascending ? a[dataField].localeCompare(b[dataField]) : b[dataField].localeCompare(a[dataField]);
+                }
+                return ascending ? a[dataField] - b[dataField] : b[dataField] - a[dataField];
+            });
+            
+            currentSort = { field, ascending };
+            renderTable();
+        }
+
+        // Populate sector dropdown
+        function populateSectorDropdown() {
+            const dropdown = document.getElementById('sectorDropdown');
+            sectorData.forEach(sector => {
+                const option = document.createElement('option');
+                option.value = sector.Sector;
+                option.textContent = sector.Sector;
+                dropdown.appendChild(option);
+            });
+        }
+
+        // Show sector detail
+        function showSectorDetail(sectorName) {
+            const card = document.getElementById('sectorDetailCard');
+            const nameEl = document.getElementById('selectedSectorName');
+            const listEl = document.getElementById('sectorFundsList');
+            
+            if (!sectorName) {
+                card.style.display = 'none';
+                return;
+            }
+            
+            const sector = sectorData.find(s => s.Sector === sectorName);
+            if (!sector) return;
+            
+            nameEl.textContent = sector.Sector;
+            
+            const funds = [];
+            for (let i = 1; i <= 10; i++) {
+                const fundData = sector[`#${i} Fund`];
+                if (fundData) {
+                    const match = fundData.match(/^(.+?) \((\d+)\)$/);
+                    if (match) {
+                        funds.push({ name: match[1], count: parseInt(match[2]) });
+                    }
+                }
+            }
+            
+            listEl.innerHTML = funds.map((fund, index) => `
+                <div class="fund-rank-item">
+                    <div class="fund-rank-number ${index < 3 ? 'top-3' : ''}">${index + 1}</div>
+                    <div class="fund-rank-name">${fund.name}</div>
+                    <div class="fund-rank-count">${fund.count}</div>
+                </div>
+            `).join('');
+            
+            card.style.display = 'block';
+        }
+
+        // Sector charts
+        function createSectorCharts() {
+            // Count sector leadership
+            const leadershipCount = {};
+            sectorData.forEach(sector => {
+                const leader = sector['#1 Fund'];
+                if (leader) {
+                    const match = leader.match(/^(.+?) \(\d+\)$/);
+                    if (match) {
+                        const fundName = match[1];
+                        leadershipCount[fundName] = (leadershipCount[fundName] || 0) + 1;
+                    }
+                }
+            });
+
+            const sortedLeaders = Object.entries(leadershipCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            // Update stat
+            document.getElementById('sectorLeaderCount').textContent = sortedLeaders[0]?.[1] || 0;
+            document.getElementById('topSectorFund').textContent = sortedLeaders[0]?.[0]?.split(' ').slice(0, 2).join(' ') || 'N/A';
+
+            // Sector dominance chart
+            const domCtx = document.getElementById('sectorDominanceChart').getContext('2d');
+            new Chart(domCtx, {
+                type: 'bar',
+                data: {
+                    labels: sortedLeaders.map(l => l[0].split(' ').slice(0, 2).join(' ')),
+                    datasets: [{
+                        label: 'Sectors Led',
+                        data: sortedLeaders.map(l => l[1]),
+                        backgroundColor: '#ff2d75',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#a89bb5' },
+                            grid: { color: 'rgba(255,107,157,0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#f0e6ff' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Top sectors chart
+            const topSectors = sectorData.slice(0, 10).map(s => {
+                const match = s['#1 Fund'].match(/\((\d+)\)$/);
+                return {
+                    sector: s.Sector,
+                    count: match ? parseInt(match[1]) : 0
+                };
+            }).sort((a, b) => b.count - a.count);
+
+            const secCtx = document.getElementById('topSectorsChart').getContext('2d');
+            new Chart(secCtx, {
+                type: 'polarArea',
+                data: {
+                    labels: topSectors.map(s => s.sector),
+                    datasets: [{
+                        data: topSectors.map(s => s.count),
+                        backgroundColor: [
+                            'rgba(255, 45, 117, 0.8)',
+                            'rgba(157, 78, 221, 0.8)',
+                            'rgba(0, 217, 255, 0.8)',
+                            'rgba(255, 215, 0, 0.8)',
+                            'rgba(255, 107, 157, 0.8)',
+                            'rgba(100, 200, 255, 0.8)',
+                            'rgba(200, 100, 255, 0.8)',
+                            'rgba(255, 200, 100, 0.8)',
+                            'rgba(100, 255, 200, 0.8)',
+                            'rgba(255, 150, 150, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#f0e6ff', padding: 10, font: { size: 10 } }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            ticks: { color: '#a89bb5', backdropColor: 'transparent' },
+                            grid: { color: 'rgba(255,107,157,0.2)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            calculateStats();
+            createShowcase();
+            createInfographics();
+            createCharts();
+            renderTable();
+            populateSectorDropdown();
+            createSectorCharts();
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    btn.classList.add('active');
+                    document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
+                });
+            });
+
+            // Table header sorting
+            document.querySelectorAll('#fundsTable th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    sortData(th.dataset.sort);
+                });
+            });
+
+            // Search
+            document.getElementById('fundSearch').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                filteredData = fundsData.filter(f => 
+                    f['Fund Name'].toLowerCase().includes(query)
+                );
+                renderTable();
+            });
+
+            // Sector dropdown
+            document.getElementById('sectorDropdown').addEventListener('change', (e) => {
+                showSectorDetail(e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>
